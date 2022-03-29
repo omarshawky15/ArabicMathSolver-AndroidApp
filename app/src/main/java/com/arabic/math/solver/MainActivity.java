@@ -133,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
                     // this method writes the files in storage
                     bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
                     uploadFile(imageFile);
-//                   uploadFile();
 
                     // close the output stream after use
                     fos.close();
