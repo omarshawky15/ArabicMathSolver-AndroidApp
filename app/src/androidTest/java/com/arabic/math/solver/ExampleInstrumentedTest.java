@@ -1,4 +1,4 @@
-package com.raghav.paint;
+package com.arabic.math.solver;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.raghav.paint", appContext.getPackageName());
+        assertEquals("com.arabic.math.solver", appContext.getPackageName());
     }
 }

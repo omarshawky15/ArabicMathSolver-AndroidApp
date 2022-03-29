@@ -1,4 +1,4 @@
-package com.raghav.paint;
+package com.arabic.math.solver;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

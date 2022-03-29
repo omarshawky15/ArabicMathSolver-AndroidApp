@@ -6,9 +6,9 @@ android {
     compileSdk 31
 
     defaultConfig {
-        applicationId "com.raghav.paint"
-        minSdkVersion 24
-        compileSdk 31
+        applicationId "com.arabic.math.solver"
+        minSdk 24
+        targetSdk 31
         versionCode 1
         versionName "1.0"
 
@@ -34,7 +34,6 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 
     implementation 'petrov.kristiyan:colorpicker-library:1.1.10'
-
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.1'

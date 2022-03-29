@@ -1,4 +1,4 @@
-package com.raghav.paint;
+package com.arabic.math.solver;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;

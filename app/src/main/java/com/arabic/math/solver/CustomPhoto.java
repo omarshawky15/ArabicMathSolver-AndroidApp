@@ -1,4 +1,4 @@
-package com.raghav.paint;
+package com.arabic.math.solver;
 
 public class CustomPhoto {
     String uri_string;

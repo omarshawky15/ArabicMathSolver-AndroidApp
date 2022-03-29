@@ -1,4 +1,4 @@
-package com.raghav.paint;
+package com.arabic.math.solver;
 
 import android.Manifest;
 import android.app.Activity;
