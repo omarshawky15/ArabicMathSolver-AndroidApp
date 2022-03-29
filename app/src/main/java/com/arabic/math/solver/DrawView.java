@@ -1,23 +1,16 @@
 package com.arabic.math.solver;
-import android.content.ContentResolver;
-import android.content.ContentValues;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class DrawView extends View {
@@ -39,12 +32,10 @@ public class DrawView extends View {
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
-    private Context context;
+
     // Constructors to initialise all the attributes
     public DrawView(Context context) {
         this(context, null);
-        this.context =context;
-//        if(context == null) Log.e("null" ,"nullnull");
     }
 
     public DrawView(Context context, AttributeSet attrs) {
@@ -59,10 +50,7 @@ public class DrawView extends View {
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
-
-        // 0xff=255 in decimal
         mPaint.setAlpha(0xff);
-
     }
 
     // this method instantiate the bitmap and object
@@ -75,7 +63,7 @@ public class DrawView extends View {
         currentColor = Color.BLACK;
 
         // set an initial brush size
-        strokeWidth = 20;
+        strokeWidth = 10;
     }
 
     // sets the current color of stroke
@@ -83,9 +71,17 @@ public class DrawView extends View {
         currentColor = color;
     }
 
+    public int getCurrentColor() {
+        return currentColor;
+    }
+
     // sets the stroke width
     public void setStrokeWidth(int width) {
         strokeWidth = width;
+    }
+
+    public int getStrokeWidth() {
+        return strokeWidth;
     }
 
     public void undo() {
@@ -134,8 +130,6 @@ public class DrawView extends View {
         mPath = new Path();
         Stroke fp = new Stroke(currentColor, strokeWidth, mPath);
         paths.add(fp);
-        System.out.println("==========================");
-        System.out.println(paths.size());
         // finally remove any curve
         // or line from the path
         mPath.reset();
@@ -174,55 +168,13 @@ public class DrawView extends View {
     // the end position
     private void touchUp() {
         mPath.lineTo(mX, mY);
-        System.out.println(mPath);
-//        storeImage();
-    }
-    private void storeImage() {
-
-
-        // getting the bitmap from DrawView class
-        Bitmap bmp = save();
-        String fileName = "image";
-        String folderName = "imageFolder";
-        File imageFile;
-        Uri imageUri;
-        OutputStream fos;
-
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-//                ContentResolver resolver = context.getApplicationContext().getContentResolver();
-                ContentResolver resolver = MainActivity.myContext.getContentResolver();
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
-                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
-                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM" + File.separator + folderName);
-                imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-                fos = resolver.openOutputStream(imageUri);
-            } else {
-                String imagesDir = Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_DCIM).toString() + File.separator + folderName;
-                System.out.println(imagesDir);
-                imageFile = new File(imagesDir);
-                if (!imageFile.exists()) {
-                    imageFile.mkdir();
-                }
-                imageFile = new File(imagesDir, fileName + ".png");
-
-                fos = new FileOutputStream(imageFile);
-            }
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
-
-            // close the output stream after use
-            fos.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     // the onTouchEvent() method provides us with
     // the information about the type of motion
     // which has been taken place, and according
     // to that we call our desired methods
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();

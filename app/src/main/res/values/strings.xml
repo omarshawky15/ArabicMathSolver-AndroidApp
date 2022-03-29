@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Arabic Math Solver</string>
+    <string name="undo_str">Undo</string>
+    <string name="save_str">Save</string>
+    <string name="color_str">Color</string>
+    <string name="gallery_str">Gallery</string>
+    <string name="stroke_str">Stroke</string>
+    <string name="pred_textview_str">Equation :\nMapping :\nSolution :\n</string>
 </resources>
