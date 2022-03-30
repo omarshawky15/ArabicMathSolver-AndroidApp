@@ -74,7 +74,12 @@ public class CanvasFragment extends Fragment {
         paint = rootView.findViewById(R.id.draw_view);
         rangeSlider = rootView.findViewById(R.id.rangebar);
         TextView pred_textview = rootView.findViewById(R.id.pred_textview);
-
+        pred_textview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paint.zoom_mode =! paint.zoom_mode;
+            }
+        });
         setOnClickMethods();
         classificationCallback = new Callback<Classification>() {
             @Override

@@ -5,16 +5,19 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
 
 public class DrawView extends View {
-
+    public boolean zoom_mode =false;
     private static final float TOUCH_TOLERANCE = 4;
     private float mX, mY;
     private Path mPath;
@@ -105,19 +108,27 @@ public class DrawView extends View {
         // save the current state of the canvas before,
         // to draw the background of the canvas
         canvas.save();
-
+        int width = getMeasuredWidth();
+        int height =getMeasuredHeight();
+        init(height, width);
         // DEFAULT color of the canvas
         int backgroundColor = Color.WHITE;
         mCanvas.drawColor(backgroundColor);
 
         // now, we iterate over the list of paths
         // and draw each path on the canvas
+        mPaint.setColor(currentColor);
+        mPaint.setStrokeWidth(strokeWidth);
         for (Stroke fp : paths) {
-            mPaint.setColor(fp.color);
-            mPaint.setStrokeWidth(fp.strokeWidth);
+
+            if(zoom_mode) {
+                fp.path.transform(inv);
+                fp.path.transform(matrix);
+            }
             mCanvas.drawPath(fp.path, mPaint);
         }
-        canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        Log.e("matrix", matrix.toString());
+        canvas.drawBitmap(mBitmap,  0,0, mBitmapPaint);
         canvas.restore();
     }
 
@@ -177,23 +188,116 @@ public class DrawView extends View {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
+        Log.e("pos", event.getX() +" " + event.getY());
+        handleTouch(event);
+        invalidate();
+        return true;
+    }
 
-        switch (event.getAction()) {
+    //Zoom & pan touch event
+    // These matrices will be used to move and zoom image
+    Matrix matrix = new Matrix();
+    Matrix savedMatrix = new Matrix();
+    Matrix inv = new Matrix();
+
+    // Remember some things for zooming
+    PointF start = new PointF();
+    PointF mid = new PointF();
+    float oldDist = 1f;
+
+    // We can be in one of these 3 states
+    static final int NONE = 0;
+    static final int PAN = 1;
+    static final int ZOOM = 2;
+    int mode = NONE;
+
+    private static final String TAG = "DebugTag";
+    private void handleTouch(MotionEvent event){
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                touchStart(x, y);
-                invalidate();
+                if(zoom_mode) {
+                    //when first finger down, get first point
+                    savedMatrix.set(matrix);
+                    start.set(event.getX(), event.getY());
+//                    Log.d(TAG, "mode=PAN");
+                    mode = PAN;
+                }
+                else {
+                    touchStart(event.getX(), event.getY());
+//                    matrix = new Matrix();
+//                    savedMatrix = new Matrix();
+                }
                 break;
-            case MotionEvent.ACTION_MOVE:
-                touchMove(x, y);
-                invalidate();
+            case MotionEvent.ACTION_POINTER_DOWN:
+                if(zoom_mode) {
+                    //when 2nd finger down, get second point
+                    oldDist = spacing(event);
+//                    Log.d(TAG, "oldDist=" + oldDist);
+                    if (oldDist > 10f) {
+                        savedMatrix.set(matrix);
+                        midPoint(mid, event); //then get the mide point as centre for zoom
+                        mode = ZOOM;
+//                        Log.d(TAG, "mode=ZOOM");
+                    }
+                }
                 break;
             case MotionEvent.ACTION_UP:
-                touchUp();
-                invalidate();
+                if(!zoom_mode){
+                    touchUp();
+//                    matrix = new Matrix();
+                    break;
+                }else {
+                    matrix.reset();
+                    inv.reset();
+                    savedMatrix.reset();
+                }
+            case MotionEvent.ACTION_POINTER_UP:       //when both fingers are released, do nothing
+                mode = NONE;
+//                Log.d(TAG, "mode=NONE");
+                break;
+            case MotionEvent.ACTION_MOVE:     //when fingers are dragged, transform matrix for panning
+                if(zoom_mode) {
+                    if (mode == PAN) {
+                        // ...
+                        matrix.invert(inv);
+                        matrix.set(savedMatrix);
+                        matrix.postTranslate(event.getX() - start.x,
+                                event.getY() - start.y);
+//                        Log.d(TAG, "Mapping rect");
+                        //start.set(event.getX(), event.getY());
+                    } else if (mode == ZOOM) { //if pinch_zoom, calculate distance ratio for zoom
+                        float newDist = spacing(event);
+//                        Log.d(TAG, "newDist=" + newDist);
+                        if (newDist > 10f) {
+                            matrix.invert(inv);
+                            matrix.set(savedMatrix);
+                            float scale = newDist / oldDist;
+                            matrix.postScale(scale, scale, mid.x, mid.y);
+                        }
+                    }
+                }
+                else {
+                    touchMove(event.getX(),event.getY());
+//                    matrix = new Matrix();
+//                    savedMatrix = new Matrix();
+                }
                 break;
         }
-        return true;
+    }
+
+    /** Determine the space between the first two fingers */
+    private float spacing(MotionEvent event) {
+        // ...
+        float x = event.getX(0) - event.getX(1);
+        float y = event.getY(0) - event.getY(1);
+        return (float)Math.sqrt(x * x + y * y);
+    }
+
+    /** Calculate the mid point of the first two fingers */
+    private void midPoint(PointF point, MotionEvent event) {
+        // ...
+        float x = event.getX(0) + event.getX(1);
+        float y = event.getY(0) + event.getY(1);
+        point.set(x / 2, y / 2);
     }
 }
