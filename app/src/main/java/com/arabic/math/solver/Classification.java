@@ -16,7 +16,7 @@ public class Classification {
     private String solution;
 
     public String getEquation() {
-        return equation;
+        return equation == null ?"":equation;
     }
 
     public void setEquation(String equation) {
@@ -24,7 +24,7 @@ public class Classification {
     }
 
     public String getMapping() {
-        return mapping;
+        return mapping == null ?"":mapping;
     }
 
     public void setMapping(String mapping) {
@@ -32,7 +32,7 @@ public class Classification {
     }
 
     public String getSolution() {
-        return solution;
+        return solution== null ?"":solution;
     }
 
     public void setSolution(String solution) {

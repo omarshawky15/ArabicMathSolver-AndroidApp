@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -40,16 +41,17 @@ public class CanvasFragment extends Fragment {
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), multiPermissionsCallback);
 
+    Callback<Classification> classificationCallback;
     private final ActivityResultLauncher<Intent> startForResultFromGallery = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == Activity.RESULT_OK){
+        if (result.getResultCode() == Activity.RESULT_OK) {
             try {
-                if (result.getData() != null){
+                if (result.getData() != null) {
                     Uri selectedImageUri = result.getData().getData();
-                    File img_file = new File(Imguru.getPathFromUri(requireContext(),selectedImageUri));
+                    File img_file = new File(Imguru.getPathFromUri(requireContext(), selectedImageUri));
                     uploadFile(img_file);
                 }
-            }catch (Exception exception){
-                Log.d("error picking image from External Storage :",exception.getLocalizedMessage());
+            } catch (Exception exception) {
+                Log.d("External storage error:", exception.getLocalizedMessage());
             }
         }
     });
@@ -71,9 +73,24 @@ public class CanvasFragment extends Fragment {
         this.rootView = mRootView;
         paint = rootView.findViewById(R.id.draw_view);
         rangeSlider = rootView.findViewById(R.id.rangebar);
+        TextView pred_textview = rootView.findViewById(R.id.pred_textview);
 
         setOnClickMethods();
+        classificationCallback = new Callback<Classification>() {
+            @Override
+            public void onResponse(@NonNull Call<Classification> call,
+                                   @NonNull Response<Classification> response) {
+                String pred_result = "Equation : " + response.body().getEquation() + "\nMapping : " + response.body().getMapping() + "\nSolution : " + response.body().getSolution();
+                pred_textview.setText(pred_result);
+            }
 
+            @Override
+            public void onFailure(@NonNull Call<Classification> call, @NonNull Throwable t) {
+                Log.e("Upload error:", t.getMessage());
+                Toast.makeText(requireContext(),"Upload error:"+ t.getMessage(),Toast.LENGTH_LONG).show();
+                pred_textview.setText(R.string.pred_textview_str);
+            }
+        };
         //pass the height and width of the custom view to the init method of the DrawView object
         ViewTreeObserver vto = paint.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -86,24 +103,11 @@ public class CanvasFragment extends Fragment {
                 paint.init(height, width);
             }
         });
+
     }
 
     private void uploadFile(File file) {
-        TextView pred_textview = rootView.findViewById(R.id.pred_textview);
-        Retrofiter.upload_classify(file, new Callback<Classification>() {
-            @Override
-            public void onResponse(@NonNull Call<Classification> call,
-                                   @NonNull Response<Classification> response) {
-                String pred_result = "Equation : " + response.body().getEquation() + "\nMapping : " + response.body().getMapping() + "\nSolution : " + response.body().getSolution();
-                pred_textview.setText(pred_result);
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Classification> call, @NonNull Throwable t) {
-                Log.e("Upload error:", t.getMessage());
-                pred_textview.setText(R.string.pred_textview_str);
-            }
-        });
+        Retrofiter.upload_classify(file, classificationCallback);
     }
 
     private void setOnClickMethods() {
@@ -115,18 +119,32 @@ public class CanvasFragment extends Fragment {
 
         undo.setOnClickListener(view -> paint.undo());
         save.setOnClickListener(view -> {
-            String[] permission_needed = {
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.INTERNET
-            };
+            String[] permission_needed;
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
+                permission_needed = new String[]{
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.INTERNET
+                };
+            }else {
+                permission_needed = new String[]{
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.INTERNET
+                };
+            }
+
             if (!PermissionHandler.checkPermissions(permission_needed, requireContext())) {
                 multiPermissionsCallback.setCallback(result -> {
                     if (!result.containsValue(Boolean.FALSE)) {
                         File imageFile = Imguru.storeImage(requireContext(), paint.save());
                         uploadFile(imageFile);
                     } else {
-                        Toast.makeText(requireContext(), "Permissions required were denied !", Toast.LENGTH_SHORT).show();
+                        StringBuilder err_message = new StringBuilder("Permissions required were denied {");
+                        for (Map.Entry<String, Boolean> i : result.entrySet())
+                            if (!i.getValue())
+                                err_message.append(i.getKey()).append(",");
+                        err_message.append("}");
+                        Toast.makeText(requireContext(), err_message.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
                 requestPermissionLauncher.launch(permission_needed);
