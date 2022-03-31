@@ -74,12 +74,12 @@ public class CanvasFragment extends Fragment {
         paint = rootView.findViewById(R.id.draw_view);
         rangeSlider = rootView.findViewById(R.id.rangebar);
         TextView pred_textview = rootView.findViewById(R.id.pred_textview);
-        pred_textview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                paint.zoom_mode =! paint.zoom_mode;
-            }
-        });
+//        pred_textview.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                paint.setMoveMode (!paint.isMoveMode());
+//            }
+//        });
         setOnClickMethods();
         classificationCallback = new Callback<Classification>() {
             @Override
@@ -176,11 +176,12 @@ public class CanvasFragment extends Fragment {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startForResultFromGallery.launch(intent);
         });
-        stroke.setOnClickListener(view -> {
-            rangeSlider.setVisibility(rangeSlider.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-        });
-        rangeSlider.setValueFrom(0.0f);
-        rangeSlider.setValueTo(100.0f);
-        rangeSlider.addOnChangeListener((slider, value, fromUser) -> paint.setStrokeWidth((int) value));
+        stroke.setOnClickListener(view -> paint.setMoveMode (!paint.isMoveMode()));
+//        stroke.setOnClickListener(view -> {
+//            rangeSlider.setVisibility(rangeSlider.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+//        });
+//        rangeSlider.setValueFrom(0.0f);
+//        rangeSlider.setValueTo(100.0f);
+//        rangeSlider.addOnChangeListener((slider, value, fromUser) -> paint.setStrokeWidth((int) value));
     }
 }
