@@ -1,4 +1,4 @@
-package com.arabic.math.solver;
+package com.arabic.math.solver.drawview;
 
 import android.graphics.Path;
 

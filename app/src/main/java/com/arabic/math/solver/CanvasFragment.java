@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +24,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.slider.RangeSlider;
+import com.arabic.math.solver.drawview.DrawView;
+import com.arabic.math.solver.retrofit.Classification;
+import com.arabic.math.solver.retrofit.Retrofiter;
 
 import java.io.File;
 import java.util.Map;
@@ -34,9 +38,11 @@ import retrofit2.Response;
 
 public class CanvasFragment extends Fragment {
     private DrawView paint;
-    private RangeSlider rangeSlider;
     private View rootView;
-
+    private static final String[] METHODS = new String[] {
+            "","polynomial","differentiate","integrate"
+    };
+    private int method_Selected ;
     PermissionHandler<Map<String, Boolean>> multiPermissionsCallback = new PermissionHandler<>();
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), multiPermissionsCallback);
@@ -72,20 +78,16 @@ public class CanvasFragment extends Fragment {
         super.onViewCreated(rootView, savedInstanceState);
         this.rootView = mRootView;
         paint = rootView.findViewById(R.id.draw_view);
-        rangeSlider = rootView.findViewById(R.id.rangebar);
         TextView pred_textview = rootView.findViewById(R.id.pred_textview);
-//        pred_textview.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                paint.setMoveMode (!paint.isMoveMode());
-//            }
-//        });
         setOnClickMethods();
         classificationCallback = new Callback<Classification>() {
             @Override
             public void onResponse(@NonNull Call<Classification> call,
                                    @NonNull Response<Classification> response) {
-                String pred_result = "Equation : " + response.body().getEquation() + "\nMapping : " + response.body().getMapping() + "\nSolution : " + response.body().getSolution();
+                String pred_result = "Equation : " + response.body().getEquation()
+                        + "\nMapping : " + response.body().getMapping()
+                        + "\nSolution : " + response.body().getSolution()
+                        + "\nError : " + response.body().getError();
                 pred_textview.setText(pred_result);
             }
 
@@ -109,18 +111,26 @@ public class CanvasFragment extends Fragment {
             }
         });
 
+        // init methods list
+        ArrayAdapter <String> methods_adapter = new ArrayAdapter<>(requireContext(),R.layout.method_list_item,METHODS);
+        AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
+        method_list.setAdapter(methods_adapter);
+        method_Selected = 0;
+        method_list.setText(METHODS[method_Selected],false);
+
     }
 
     private void uploadFile(File file) {
-        Retrofiter.upload_classify(file, classificationCallback);
+        Retrofiter.upload_classify(file, classificationCallback,METHODS[method_Selected]);
     }
 
     private void setOnClickMethods() {
-        ImageButton save, color, stroke, undo;
+        AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
+        ImageButton save, gallery, move, undo;
         undo = rootView.findViewById(R.id.btn_undo);
         save = rootView.findViewById(R.id.btn_save);
-        color = rootView.findViewById(R.id.btn_color);
-        stroke = rootView.findViewById(R.id.btn_stroke);
+        gallery = rootView.findViewById(R.id.btn_color);
+        move = rootView.findViewById(R.id.btn_stroke);
 
         undo.setOnClickListener(view -> paint.undo());
         save.setOnClickListener(view -> {
@@ -158,30 +168,11 @@ public class CanvasFragment extends Fragment {
                 uploadFile(imageFile);
             }
         });
-        color.setOnClickListener(view -> {
-//            final ColorPicker colorPicker = new ColorPicker(requireActivity());
-//            colorPicker.setColumns(5)
-//                    .setDefaultColorButton(paint.getCurrentColor())
-//                    .setOnFastChooseColorListener(new ColorPicker.OnFastChooseColorListener() {
-//                        @Override
-//                        public void setOnFastChooseColorListener(int position, int color) {
-//                            paint.setColor(color);
-//                        }
-//
-//                        @Override
-//                        public void onCancel() {
-//                            colorPicker.dismissDialog();
-//                        }
-//                    }).show();
+        gallery.setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startForResultFromGallery.launch(intent);
         });
-        stroke.setOnClickListener(view -> paint.setMoveMode (!paint.isMoveMode()));
-//        stroke.setOnClickListener(view -> {
-//            rangeSlider.setVisibility(rangeSlider.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-//        });
-//        rangeSlider.setValueFrom(0.0f);
-//        rangeSlider.setValueTo(100.0f);
-//        rangeSlider.addOnChangeListener((slider, value, fromUser) -> paint.setStrokeWidth((int) value));
+        move.setOnClickListener(view -> paint.setMoveMode (!paint.isMoveMode()));
+        method_list.setOnItemClickListener((parent, view, position, id) -> method_Selected = position);
     }
 }

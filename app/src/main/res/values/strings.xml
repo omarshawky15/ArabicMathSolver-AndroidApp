@@ -5,5 +5,6 @@
     <string name="color_str">Color</string>
     <string name="gallery_str">Gallery</string>
     <string name="stroke_str">Stroke</string>
-    <string name="pred_textview_str">Equation :\nMapping :\nSolution :\n</string>
+    <string name="pred_textview_str">Equation :\nMapping :\nSolution :\nError : None\n</string>
+    <string name="method">Method</string>
 </resources>

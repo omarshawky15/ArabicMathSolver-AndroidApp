@@ -76,8 +76,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/method_menu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/method">
 
-        <com.arabic.math.solver.DrawView
+            <AutoCompleteTextView
+                android:id="@+id/method_menu_autocomplete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.arabic.math.solver.drawview.DrawView
             android:id="@+id/draw_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

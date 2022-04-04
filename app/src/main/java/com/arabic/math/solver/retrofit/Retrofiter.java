@@ -1,4 +1,4 @@
-package com.arabic.math.solver;
+package com.arabic.math.solver.retrofit;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +13,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Retrofiter {
-    private final static String BASE_URL = "https://sample-deploy12.herokuapp.com/";
+    //    private final static String BASE_URL = "https://sample-deploy12.herokuapp.com/"; // for server
+    private final static String BASE_URL = "http://10.0.2.2:5000/"; // for local host from VM
     private static Retrofit retrofit = null;
     private Retrofiter(){};
     public static Retrofit getInstance() {
@@ -33,13 +34,13 @@ public class Retrofiter {
         }
         return retrofit;
     }
-    public static void upload_classify(File file, Callback<Classification> callback) {
+    public static void upload_classify(File file, Callback<Classification> callback, String method) {
         ClassifyAPI service = Retrofiter.getInstance().create(ClassifyAPI.class);
         RequestBody requestFile =
                 RequestBody.create(file, MediaType.parse("image/png"));
         MultipartBody.Part body =
                 MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-        service.classify(body).enqueue(callback);
+        service.classify(body,method).enqueue(callback);
     }
 
 }

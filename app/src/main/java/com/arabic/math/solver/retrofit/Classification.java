@@ -1,10 +1,13 @@
-package com.arabic.math.solver;
+package com.arabic.math.solver.retrofit;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Classification {
 
+    @SerializedName("error")
+    @Expose
+    private String error;
     @SerializedName("equation")
     @Expose
     private String equation;
@@ -39,4 +42,11 @@ public class Classification {
         this.solution = solution;
     }
 
+    public String getError() {
+        return error== null ?"None":error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
 }

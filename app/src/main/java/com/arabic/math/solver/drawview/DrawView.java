@@ -1,4 +1,4 @@
-package com.arabic.math.solver;
+package com.arabic.math.solver.drawview;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -24,16 +24,16 @@ public class DrawView extends View {
     // the Paint class encapsulates the color
     // and style information about
     // how to draw the geometries,text and bitmaps
-    private Paint mPaint;
+    private final Paint mPaint;
 
     // ArrayList to store all the strokes
     // drawn by the user on the Canvas
-    private ArrayList<Stroke> paths = new ArrayList<>();
-    private int currentColor;
-    private int strokeWidth;
+    private final ArrayList<Stroke> paths;
+    private final int DEFAULT_COLOR = Color.BLACK;
+    private final int DEFAULT_STROKE = 10;
     private Bitmap mBitmap;
     private Canvas mCanvas;
-    private Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+    private Paint mBitmapPaint ;
 
     //Zoom & pan touch event
     // These matrices will be used to move and zoom image
@@ -47,9 +47,9 @@ public class DrawView extends View {
     float oldDist = 1f;
 
     // We can be in one of these 3 states
-    static final int NONE = 0;
-    static final int PAN = 1;
-    static final int ZOOM = 2;
+    private static final int NONE = 0;
+    private static final int PAN = 1;
+    private static final int ZOOM = 2;
     private int mode = NONE;
     private boolean moveMode = false;
 
@@ -66,12 +66,13 @@ public class DrawView extends View {
         // the drawings of the user
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
-        mPaint.setColor(Color.BLACK);
+        mPaint.setColor(DEFAULT_COLOR);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setAlpha(0xff);
 
+        paths = new ArrayList<>();
         matrix = new Matrix();
         savedMatrix = new Matrix();
         inv = new Matrix();
@@ -82,31 +83,8 @@ public class DrawView extends View {
 
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+        mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 
-        // set an initial color of the brush
-        currentColor = Color.BLACK;
-
-        // set an initial brush size
-        strokeWidth = 10;
-
-    }
-
-    // sets the current color of stroke
-    public void setColor(int color) {
-        currentColor = color;
-    }
-
-    public int getCurrentColor() {
-        return currentColor;
-    }
-
-    // sets the stroke width
-    public void setStrokeWidth(int width) {
-        strokeWidth = width;
-    }
-
-    public int getStrokeWidth() {
-        return strokeWidth;
     }
 
     public boolean isMoveMode() {
@@ -158,8 +136,8 @@ public class DrawView extends View {
     private void drawAndScalePaths(Matrix scaleMatrix, Matrix inverse, boolean doScale) {
         int backgroundColor = Color.WHITE;
         mCanvas.drawColor(backgroundColor);
-        mPaint.setColor(currentColor);
-        mPaint.setStrokeWidth(strokeWidth);
+        mPaint.setColor(DEFAULT_COLOR);
+        mPaint.setStrokeWidth(DEFAULT_STROKE);
         for (Stroke fp : paths) {
             if (doScale) {
                 fp.path.transform(inverse);
@@ -186,7 +164,7 @@ public class DrawView extends View {
     // and add it to the paths list
     private void touchStart(float x, float y) {
         mPath = new Path();
-        Stroke fp = new Stroke(currentColor, strokeWidth, mPath);
+        Stroke fp = new Stroke(DEFAULT_COLOR, DEFAULT_STROKE, mPath);
         paths.add(fp);
         // finally remove any curve
         // or line from the path
@@ -235,72 +213,11 @@ public class DrawView extends View {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-//        Log.e("pos", event.getX() +" " + event.getY());
-//        handleTouch(event);
         if(isMoveMode())handleIfMoveMode(event);
         else handleIfPaintMode(event);
         invalidate();
         return true;
     }
-//
-//    private void handleTouch(MotionEvent event) {
-//        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-//            case MotionEvent.ACTION_DOWN:
-//                if (moveMode) {
-//                    //when first finger down, get first point
-//                    savedMatrix.set(matrix);
-//                    start.set(event.getX(), event.getY());
-//                    mode = PAN;
-//                } else {
-//                    touchStart(event.getX(), event.getY());
-//                }
-//                break;
-//            case MotionEvent.ACTION_POINTER_DOWN:
-//                if (moveMode) {
-//                    //when 2nd finger down, get second point
-//                    oldDist = spacing(event);
-//                    if (oldDist > 10f) {
-//                        savedMatrix.set(matrix);
-//                        midPoint(mid, event); //then get the mide point as centre for zoom
-//                        mode = ZOOM;
-//                    }
-//                }
-//                break;
-//            case MotionEvent.ACTION_UP:
-//                if (!moveMode) {
-//                    touchUp();
-//                    break;
-//                } else {
-//                    matrix.reset();
-//                    inv.reset();
-//                    savedMatrix.reset();
-//                }
-//            case MotionEvent.ACTION_POINTER_UP:       //when both fingers are released, do nothing
-//                mode = NONE;
-//                break;
-//            case MotionEvent.ACTION_MOVE:     //when fingers are dragged, transform matrix for panning
-//                if (moveMode) {
-//                    if (mode == PAN) {
-//                        // ...
-//                        matrix.invert(inv);
-//                        matrix.set(savedMatrix);
-//                        matrix.postTranslate(event.getX() - start.x,
-//                                event.getY() - start.y);
-//                    } else if (mode == ZOOM) { //if pinch_zoom, calculate distance ratio for zoom
-//                        float newDist = spacing(event);
-//                        if (newDist > 10f) {
-//                            matrix.invert(inv);
-//                            matrix.set(savedMatrix);
-//                            float scale = newDist / oldDist;
-//                            matrix.postScale(scale, scale, mid.x, mid.y);
-//                        }
-//                    }
-//                } else {
-//                    touchMove(event.getX(), event.getY());
-//                }
-//                break;
-//        }
-//    }
 
     private void handleIfPaintMode(MotionEvent event) {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
@@ -329,7 +246,7 @@ public class DrawView extends View {
                 oldDist = spacing(event);
                 if (oldDist > 10f) {
                     savedMatrix.set(matrix);
-                    midPoint(mid, event); //then get the mide point as centre for zoom
+                    midPoint(mid, event); //then get the mid point as centre for zoom
                     mode = ZOOM;
                 }
                 break;
