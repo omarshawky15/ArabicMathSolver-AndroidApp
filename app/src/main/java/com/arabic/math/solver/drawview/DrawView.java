@@ -17,26 +17,24 @@ import android.view.View;
 import com.arabic.math.solver.R;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class DrawView extends View {
 
     private static final float TOUCH_TOLERANCE = 4;
     private float mX, mY;
     private Path mPath;
+    private DrawViewManager manager ;
 
     // the Paint class encapsulates the color
     // and style information about
     // how to draw the geometries,text and bitmaps
-    private final Paint mPaint;
-    private View parentView ;
-    // ArrayList to store all the strokes
-    // drawn by the user on the Canvas
-    private final ArrayList<Stroke> paths, redoPaths;
     private final int DEFAULT_COLOR = Color.BLACK;
     private final int DEFAULT_STROKE = 10;
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private Paint mBitmapPaint;
+    private final Paint mPaint;
 
     //Zoom & pan touch event
     // These matrices will be used to move and zoom image
@@ -49,8 +47,6 @@ public class DrawView extends View {
     PointF mid = new PointF();
     float oldDist = 1f;
 
-    // We can be in one of these states
-    private int mode;
 
     // Constructors to initialise all the attributes
     public DrawView(Context context) {
@@ -70,77 +66,40 @@ public class DrawView extends View {
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setAlpha(0xff);
+        mPaint.setStrokeWidth(DEFAULT_STROKE);
 
-        mode = DrawViewModes.DRAW;
-
-        paths = new ArrayList<>();
-        redoPaths = new ArrayList<>();
+        // scaling variables
         matrix = new Matrix();
         savedMatrix = new Matrix();
         inv = new Matrix();
-        resetUndoRedo();
+    }
+
+    public DrawViewManager getManager() {
+        return manager;
+    }
+
+    public void setManager(DrawViewManager manager) {
+        this.manager = manager;
     }
 
     // this method instantiate the bitmap and object
     public void init(int height, int width) {
-
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
-
     }
 
-    public boolean isMoveMode() {
-        return mode < DrawViewModes.DRAW && mode >= DrawViewModes.NONE;
-    }
-
-    public void setMode(int mode) {
-        this.mode = mode;
-        resetMatrices();
-    }
-
-    public void setParentView(View parentView) {
-        this.parentView = parentView;
-    }
-
-    private void resetMatrices() {
+    void resetMatrices() {
         matrix.reset();
         inv.reset();
         savedMatrix.reset();
     }
 
-    public void undo() {
-        if (paths.size() != 0) {
-            redoPaths.add(paths.get(paths.size() - 1));
-            paths.remove(paths.size() - 1);
-            invalidate();
-        }
-        resetUndoRedo();
-    }
-
-
-    public void redo() {
-        if (redoPaths.size() != 0) {
-            paths.add(redoPaths.get(redoPaths.size() - 1));
-            redoPaths.remove(redoPaths.size() - 1);
-            invalidate();
-        }
-        resetUndoRedo();
-
-    }
-    public void clearRedo() {
-        redoPaths.clear();
-        resetUndoRedo();
-    }
-    public void resetUndoRedo (){
-        this.parentView.findViewById(R.id.undo_fab).setEnabled(paths.size() != 0);
-        this.parentView.findViewById(R.id.redo_fab).setEnabled(redoPaths.size() != 0);
-    }
     // this methods returns the current bitmap
-    public Bitmap save() {
-        int width = getMeasuredWidth();
-        int height = getMeasuredHeight();
-        init(height, width);
+    protected Bitmap save() {
+//        int width = getMeasuredWidth();
+//        int height = getMeasuredHeight();
+//        init(height, width);
         Matrix scaleMatrix = computeScaleMatrix();
         drawAndScalePaths(scaleMatrix, new Matrix(), true);
         return mBitmap;
@@ -148,8 +107,9 @@ public class DrawView extends View {
 
     private Matrix computeScaleMatrix() {
         RectF new_dim = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MIN_VALUE, Float.MIN_VALUE), tempRect = new RectF(), old_dim = new RectF(0, 0, getMeasuredWidth(), getMeasuredHeight());
-        for (Stroke i : paths) {
-            i.path.computeBounds(tempRect, false);
+        for (Iterator<Path> it = manager.getBackPaths(); it.hasNext(); ) {
+            Path i = it.next();
+            i.computeBounds(tempRect, false);
             new_dim.left = Math.min(new_dim.left, tempRect.left);
             new_dim.top = Math.min(new_dim.top, tempRect.top);
             new_dim.bottom = Math.max(new_dim.bottom, tempRect.bottom);
@@ -163,14 +123,13 @@ public class DrawView extends View {
     private void drawAndScalePaths(Matrix scaleMatrix, Matrix inverse, boolean doScale) {
         int backgroundColor = Color.WHITE;
         mCanvas.drawColor(backgroundColor);
-        mPaint.setColor(DEFAULT_COLOR);
-        mPaint.setStrokeWidth(DEFAULT_STROKE);
-        for (Stroke fp : paths) {
+        for (Iterator<Path> it = manager.getBackPaths(); it.hasNext(); ) {
+            Path i = it.next();
             if (doScale) {
-                fp.path.transform(inverse);
-                fp.path.transform(scaleMatrix);
+                i.transform(inverse);
+                i.transform(scaleMatrix);
             }
-            mCanvas.drawPath(fp.path, mPaint);
+            mCanvas.drawPath(i, mPaint);
         }
     }
 
@@ -179,7 +138,7 @@ public class DrawView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
-        drawAndScalePaths(matrix, inv, isMoveMode());
+        drawAndScalePaths(matrix, inv, manager.isMoveMode());
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.restore();
     }
@@ -191,10 +150,10 @@ public class DrawView extends View {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (isMoveMode()) handleIfMoveMode(event);
+        if (manager.isMoveMode()) handleIfMoveMode(event);
         else {
             handleIfPaintMode(event);
-            clearRedo();
+            manager.clearRedo();
         }
         invalidate();
         return true;
@@ -206,10 +165,7 @@ public class DrawView extends View {
     // and add it to the paths list
     private void touchStart(float x, float y) {
         mPath = new Path();
-        Stroke fp = new Stroke(DEFAULT_COLOR, DEFAULT_STROKE, mPath);
-        paths.add(fp);
-        // finally remove any curve
-        // or line from the path
+        manager.addBack(mPath);
         mPath.reset();
 
         // this methods sets the starting
@@ -269,7 +225,7 @@ public class DrawView extends View {
                 //when first finger down, get first point
                 savedMatrix.set(matrix);
                 start.set(event.getX(), event.getY());
-                mode = DrawViewModes.PAN;
+                manager.setMode(DrawViewModes.PAN);
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 //when 2nd finger down, get second point
@@ -277,21 +233,21 @@ public class DrawView extends View {
                 if (oldDist > 10f) {
                     savedMatrix.set(matrix);
                     midPoint(mid, event); //then get the mid point as centre for zoom
-                    mode = DrawViewModes.ZOOM;
+                    manager.setMode(DrawViewModes.ZOOM);
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 resetMatrices();
             case MotionEvent.ACTION_POINTER_UP:       //when both fingers are released, do nothing
-                mode = DrawViewModes.NONE;
+                manager.setMode(DrawViewModes.NONE);
                 break;
             case MotionEvent.ACTION_MOVE:     //when fingers are dragged, transform matrix for panning
-                if (mode == DrawViewModes.PAN) {
+                if (manager.getMode() == DrawViewModes.PAN) {
                     matrix.invert(inv);
                     matrix.set(savedMatrix);
                     matrix.postTranslate(event.getX() - start.x,
                             event.getY() - start.y);
-                } else if (mode == DrawViewModes.ZOOM) { //if pinch_zoom, calculate distance ratio for zoom
+                } else if (manager.getMode() == DrawViewModes.ZOOM) { //if pinch_zoom, calculate distance ratio for zoom
                     float newDist = spacing(event);
                     if (newDist > 10f) {
                         matrix.invert(inv);

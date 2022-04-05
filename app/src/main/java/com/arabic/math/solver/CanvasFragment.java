@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.arabic.math.solver.drawview.DrawView;
+import com.arabic.math.solver.drawview.DrawViewManager;
 import com.arabic.math.solver.drawview.DrawViewModes;
 import com.arabic.math.solver.retrofit.Classification;
 import com.arabic.math.solver.retrofit.Retrofiter;
@@ -39,8 +40,8 @@ import retrofit2.Response;
 
 
 public class CanvasFragment extends Fragment {
-    private DrawView paint;
     private View rootView;
+    private DrawViewManager drawViewManager ;
     private static final String[] METHODS = new String[] {
             "","polynomial","differentiate","integrate"
     };
@@ -79,8 +80,7 @@ public class CanvasFragment extends Fragment {
     public void onViewCreated(@NonNull View mRootView, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(rootView, savedInstanceState);
         this.rootView = mRootView;
-        paint = rootView.findViewById(R.id.draw_view);
-        paint.setParentView(this.rootView);
+
         TextView pred_textview = rootView.findViewById(R.id.pred_textview);
         setOnClickMethods();
         classificationCallback = new Callback<Classification>() {
@@ -101,19 +101,8 @@ public class CanvasFragment extends Fragment {
                 pred_textview.setText(R.string.pred_textview_str);
             }
         };
-        //pass the height and width of the custom view to the init method of the DrawView object
-        ViewTreeObserver vto = paint.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
 
-                paint.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                int width = paint.getMeasuredWidth();
-                int height = paint.getMeasuredHeight();
-                paint.init(height, width);
-            }
-        });
-
+        initDrawView();
         // init methods list
         ArrayAdapter <String> methods_adapter = new ArrayAdapter<>(requireContext(),R.layout.method_list_item,METHODS);
         AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
@@ -126,7 +115,26 @@ public class CanvasFragment extends Fragment {
     private void uploadFile(File file) {
         Retrofiter.upload_classify(file, classificationCallback,METHODS[method_Selected]);
     }
+    private void initDrawView() {
+        DrawView paint = rootView.findViewById(R.id.draw_view);
+        FloatingActionButton undo,redo;
+        undo = rootView.findViewById(R.id.undo_fab);
+        redo = rootView.findViewById(R.id.redo_fab);
+        this.drawViewManager = new DrawViewManager(paint).with(undo,redo);
+        paint.setManager(drawViewManager);
+        //pass the height and width of the custom view to the init method of the DrawView object
+        ViewTreeObserver vto = paint.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                paint.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int width = paint.getMeasuredWidth();
+                int height = paint.getMeasuredHeight();
+                paint.init(height, width);
+            }
+        });
 
+    }
     private void setOnClickMethods() {
         AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
         ImageButton save, gallery;
@@ -137,8 +145,8 @@ public class CanvasFragment extends Fragment {
         save = rootView.findViewById(R.id.btn_save);
         gallery = rootView.findViewById(R.id.btn_gallery);
         move = rootView.findViewById(R.id.move_fab);
-        redo.setOnClickListener(view -> paint.redo());
-        undo.setOnClickListener(view -> paint.undo());
+        redo.setOnClickListener(view -> drawViewManager.redo());
+        undo.setOnClickListener(view -> drawViewManager.undo());
         save.setOnClickListener(view -> {
             String[] permission_needed;
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
@@ -157,7 +165,7 @@ public class CanvasFragment extends Fragment {
             if (!PermissionHandler.checkPermissions(permission_needed, requireContext())) {
                 multiPermissionsCallback.setCallback(result -> {
                     if (!result.containsValue(Boolean.FALSE)) {
-                        File imageFile = Imguru.storeImage(requireContext(), paint.save());
+                        File imageFile = Imguru.storeImage(requireContext(), drawViewManager.save());
                         uploadFile(imageFile);
                     } else {
                         StringBuilder err_message = new StringBuilder("Permissions required were denied {");
@@ -170,7 +178,7 @@ public class CanvasFragment extends Fragment {
                 });
                 requestPermissionLauncher.launch(permission_needed);
             } else {
-                File imageFile = Imguru.storeImage(requireContext(), paint.save());
+                File imageFile = Imguru.storeImage(requireContext(), drawViewManager.save());
                 uploadFile(imageFile);
             }
         });
@@ -178,7 +186,7 @@ public class CanvasFragment extends Fragment {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startForResultFromGallery.launch(intent);
         });
-        move.setOnClickListener(view -> paint.setMode(paint.isMoveMode()? DrawViewModes.DRAW:DrawViewModes.NONE));
+        move.setOnClickListener(view -> drawViewManager.setMode(drawViewManager.isMoveMode()? DrawViewModes.DRAW:DrawViewModes.NONE));
         method_list.setOnItemClickListener((parent, view, position, id) -> method_Selected = position);
     }
 }
