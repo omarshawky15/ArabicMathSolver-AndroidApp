@@ -149,7 +149,6 @@ public class DrawView extends View {
             handleIfEraseMode(event);
         } else {
             handleIfPaintMode(event);
-            manager.clearRedo();
         }
         invalidate();
         return true;

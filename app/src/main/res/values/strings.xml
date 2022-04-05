@@ -5,7 +5,7 @@
     <string name="color_str">Color</string>
     <string name="gallery_str">Gallery</string>
     <string name="move_str">Move</string>
-    <string name="pred_textview_str">Equation :\nMapping :\nSolution :\nError : None</string>
+    <string name="pred_textview_str">Equation :\nMapping :\nSolution :\nError :</string>
     <string name="method">Method</string>
     <string name="redo">redo</string>
     <string name="eraser_str">Eraser</string>

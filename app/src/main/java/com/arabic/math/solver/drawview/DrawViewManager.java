@@ -12,22 +12,19 @@ import java.util.Collections;
 import java.util.List;
 
 public class DrawViewManager {
-    private final List<Path> backwardPaths,forwardPaths;
-    private final List<Pair<Character,Pair<Integer,Path>>> previousCmd , nextCmd;
-    private int mode;
+    private final List<Path> backwardPaths;
+    private final List<Pair<Character, Pair<Integer, Path>>> previousCmd, nextCmd;
     private final DrawView paint;
-    private FloatingActionButton redoFab , undoFab;
-    private int backwardSize ,forwardSize;
-    public DrawViewManager(DrawView paint){
+    private FloatingActionButton redoFab, undoFab;
+    private int mode;
+
+    public DrawViewManager(DrawView paint) {
         mode = DrawViewModes.DRAW;
         backwardPaths = new ArrayList<>();
-        forwardPaths = new ArrayList<>();
         previousCmd = new ArrayList<>();
         nextCmd = new ArrayList<>();
-        backwardSize=0 ;
-        forwardSize =0 ;
-        mode= DrawViewModes.DRAW;
-        this.paint = paint ;
+        mode = DrawViewModes.DRAW;
+        this.paint = paint;
     }
 
     public boolean isMoveMode() {
@@ -37,50 +34,42 @@ public class DrawViewManager {
     public boolean isErase() {
         return mode == DrawViewModes.ERASE;
     }
+
     public void setMode(int mode) {
         this.mode = mode;
         paint.resetMatrices();
     }
 
     public void undo() {
-        if (backwardSize!= 0) {
-            backwardSize--;
-            forwardSize++;
-            forwardPaths.add(backwardPaths.get(backwardSize));
-            backwardPaths.remove(backwardSize);
-//            previousCmd.add(new Pair<>('U',new Pair<>(backwardSize)))
-            paint.invalidate();
+        int idx = previousCmd.size() - 1;
+        if (idx >= 0) {
+            if (previousCmd.get(idx).first == Commands.DELETE) {
+                backwardPaths.add(previousCmd.get(idx).second.first, previousCmd.get(idx).second.second);
+            } else {
+                backwardPaths.remove((int) previousCmd.get(idx).second.first);
+            }
+            nextCmd.add(previousCmd.get(idx));
+            previousCmd.remove(idx);
+            resetUndoRedo();
         }
-        resetUndoRedo();
     }
-
 
     public void redo() {
-        if (forwardSize != 0) {
-            forwardSize--;
-            backwardSize++;
-            backwardPaths.add(forwardPaths.get(forwardSize));
-            forwardPaths.remove(forwardSize);
-            paint.invalidate();
+        int idx = nextCmd.size() - 1;
+        if (idx >= 0) {
+            if (nextCmd.get(idx).first == Commands.ADD) {
+                backwardPaths.add(nextCmd.get(idx).second.first, nextCmd.get(idx).second.second);
+            } else {
+                backwardPaths.remove((int) nextCmd.get(idx).second.first);
+            }
+            previousCmd.add(nextCmd.get(idx));
+            nextCmd.remove(idx);
+            resetUndoRedo();
         }
-        resetUndoRedo();
-    }
-    public void clearRedo() {
-        forwardSize=0;
-        forwardPaths.clear();
-        resetUndoRedo();
-    }
-    public void resetUndoRedo (){
-        undoFab.setEnabled(backwardSize != 0);
-        redoFab.setEnabled(forwardSize != 0);
     }
 
     public List<Path> getBackwardPaths() {
-        return  Collections.unmodifiableList(backwardPaths);
-    }
-
-    public List<Path> getForwardPaths() {
-        return  Collections.unmodifiableList(forwardPaths);
+        return Collections.unmodifiableList(backwardPaths);
     }
 
     public int getMode() {
@@ -89,8 +78,8 @@ public class DrawViewManager {
 
 
     public DrawViewManager with(FloatingActionButton undo, FloatingActionButton redo) {
-        this.undoFab = undo ;
-        this.redoFab = redo ;
+        this.undoFab = undo;
+        this.redoFab = redo;
         resetUndoRedo();
         return this;
     }
@@ -100,13 +89,27 @@ public class DrawViewManager {
     }
 
     public void push(Path mPath) {
+        previousCmd.add(new Pair<>(Commands.ADD, new Pair<>(backwardPaths.size(), mPath)));
         backwardPaths.add(mPath);
-        backwardSize++;
+        nextCmd.clear();
         resetUndoRedo();
-
     }
 
     public void pop(int i) {
+        previousCmd.add(new Pair<>(Commands.DELETE, new Pair<>(i,backwardPaths.get(i) )));
+        backwardPaths.remove(i);
+        nextCmd.clear();
+        resetUndoRedo();
+    }
 
+    public void resetUndoRedo() {
+        undoFab.setEnabled(previousCmd.size() != 0);
+        redoFab.setEnabled(nextCmd.size() != 0);
+        paint.invalidate();
+    }
+
+    protected static class Commands {
+        public static final char ADD = 'A';
+        public static final char DELETE = 'D';
     }
 }

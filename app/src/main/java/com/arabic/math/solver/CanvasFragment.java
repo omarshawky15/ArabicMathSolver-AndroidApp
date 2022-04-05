@@ -98,8 +98,8 @@ public class CanvasFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<Classification> call, @NonNull Throwable t) {
                 Log.e("Upload error:", t.getMessage());
-                Toast.makeText(requireContext(), "Upload error:" + t.getMessage(), Toast.LENGTH_LONG).show();
-                pred_textview.setText(R.string.pred_textview_str);
+                String pred_result = getResources().getString(R.string.pred_textview_str) + t.getMessage();
+                pred_textview.setText(pred_result);
             }
         };
 
@@ -121,16 +121,15 @@ public class CanvasFragment extends Fragment {
             int item_id = item.getItemId();
             if (item_id == R.id.move_tool) {
                 drawViewManager.setMode(DrawViewModes.NONE);
-                return true ;
+                return true;
             } else if (item_id == R.id.eraser_tool) {
                 drawViewManager.setMode(DrawViewModes.ERASE);
-                return true ;
-            }
-            else if (item_id == R.id.pen_tool) {
+                return true;
+            } else if (item_id == R.id.pen_tool) {
                 drawViewManager.setMode(DrawViewModes.DRAW);
-                return true ;
+                return true;
             }
-            return false ;
+            return false;
         });
     }
 
@@ -162,13 +161,12 @@ public class CanvasFragment extends Fragment {
     private void setOnClickMethods() {
         AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
         ImageButton save, gallery;
-        FloatingActionButton move, undo, redo;
+        FloatingActionButton undo, redo;
 
         undo = rootView.findViewById(R.id.undo_fab);
         redo = rootView.findViewById(R.id.redo_fab);
         save = rootView.findViewById(R.id.btn_save);
         gallery = rootView.findViewById(R.id.btn_gallery);
-//        move = rootView.findViewById(R.id.move_fab);
         redo.setOnClickListener(view -> drawViewManager.redo());
         undo.setOnClickListener(view -> drawViewManager.undo());
         save.setOnClickListener(view -> {
@@ -210,7 +208,6 @@ public class CanvasFragment extends Fragment {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startForResultFromGallery.launch(intent);
         });
-//        move.setOnClickListener(view -> drawViewManager.setMode(drawViewManager.isMoveMode()? DrawViewModes.DRAW:DrawViewModes.NONE));
         method_list.setOnItemClickListener((parent, view, position, id) -> method_Selected = position);
     }
 }
