@@ -4,7 +4,8 @@
     <string name="save_str">Save</string>
     <string name="color_str">Color</string>
     <string name="gallery_str">Gallery</string>
-    <string name="stroke_str">Stroke</string>
+    <string name="move_str">Move</string>
     <string name="pred_textview_str">Equation :\nMapping :\nSolution :\nError : None\n</string>
     <string name="method">Method</string>
+    <string name="redo">redo</string>
 </resources>

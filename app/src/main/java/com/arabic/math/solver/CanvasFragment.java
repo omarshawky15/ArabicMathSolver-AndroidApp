@@ -25,8 +25,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.arabic.math.solver.drawview.DrawView;
+import com.arabic.math.solver.drawview.DrawViewModes;
 import com.arabic.math.solver.retrofit.Classification;
 import com.arabic.math.solver.retrofit.Retrofiter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.util.Map;
@@ -78,6 +80,7 @@ public class CanvasFragment extends Fragment {
         super.onViewCreated(rootView, savedInstanceState);
         this.rootView = mRootView;
         paint = rootView.findViewById(R.id.draw_view);
+        paint.setParentView(this.rootView);
         TextView pred_textview = rootView.findViewById(R.id.pred_textview);
         setOnClickMethods();
         classificationCallback = new Callback<Classification>() {
@@ -126,12 +129,15 @@ public class CanvasFragment extends Fragment {
 
     private void setOnClickMethods() {
         AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
-        ImageButton save, gallery, move, undo;
-        undo = rootView.findViewById(R.id.btn_undo);
-        save = rootView.findViewById(R.id.btn_save);
-        gallery = rootView.findViewById(R.id.btn_color);
-        move = rootView.findViewById(R.id.btn_stroke);
+        ImageButton save, gallery;
+        FloatingActionButton  move,undo,redo;
 
+        undo = rootView.findViewById(R.id.undo_fab);
+        redo = rootView.findViewById(R.id.redo_fab);
+        save = rootView.findViewById(R.id.btn_save);
+        gallery = rootView.findViewById(R.id.btn_gallery);
+        move = rootView.findViewById(R.id.move_fab);
+        redo.setOnClickListener(view -> paint.redo());
         undo.setOnClickListener(view -> paint.undo());
         save.setOnClickListener(view -> {
             String[] permission_needed;
@@ -172,7 +178,7 @@ public class CanvasFragment extends Fragment {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startForResultFromGallery.launch(intent);
         });
-        move.setOnClickListener(view -> paint.setMoveMode (!paint.isMoveMode()));
+        move.setOnClickListener(view -> paint.setMode(paint.isMoveMode()? DrawViewModes.DRAW:DrawViewModes.NONE));
         method_list.setOnItemClickListener((parent, view, position, id) -> method_Selected = position);
     }
 }

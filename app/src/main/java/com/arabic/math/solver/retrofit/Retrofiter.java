@@ -13,8 +13,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Retrofiter {
-    //    private final static String BASE_URL = "https://sample-deploy12.herokuapp.com/"; // for server
-    private final static String BASE_URL = "http://10.0.2.2:5000/"; // for local host from VM
+    private final static String BASE_URL = "https://letters-model.herokuapp.com/"; // for server
+//    private final static String BASE_URL = "http://10.0.2.2:5000/"; // for local host from VM
     private static Retrofit retrofit = null;
     private Retrofiter(){};
     public static Retrofit getInstance() {

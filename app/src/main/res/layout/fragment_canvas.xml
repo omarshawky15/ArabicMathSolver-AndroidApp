@@ -33,49 +33,27 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/btn_undo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:contentDescription="@string/undo_str"
-                android:src="@drawable/ic_undo"
-                android:text="@string/undo_str" />
 
             <ImageButton
                 android:id="@+id/btn_save"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
                 android:layout_weight="1"
                 android:contentDescription="@string/save_str"
                 android:src="@drawable/ic_floppy_disk"
                 android:text="@string/save_str" />
 
             <ImageButton
-                android:id="@+id/btn_stroke"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:contentDescription="@string/stroke_str"
-                android:src="@drawable/ic_paint_brush"
-                android:text="@string/stroke_str" />
-
-            <ImageButton
-                android:id="@+id/btn_color"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:id="@+id/btn_gallery"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
                 android:layout_weight="1"
                 android:contentDescription="@string/gallery_str"
-                android:src="@drawable/ic_gallery"
+                android:src="@mipmap/ic_gallery"
                 android:text="@string/gallery_str" />
 
         </LinearLayout>
 
-        <com.google.android.material.slider.RangeSlider
-            android:id="@+id/rangebar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/method_menu"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -87,8 +65,7 @@
                 android:id="@+id/method_menu_autocomplete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none"
-                />
+                android:inputType="none" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.arabic.math.solver.drawview.DrawView
@@ -97,4 +74,68 @@
             android:layout_height="match_parent" />
 
     </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/utils_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/undo_fab"
+            style="@style/Theme.ArabicMathSolver.lowerFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/undo_str"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_undo"
+            app:tint="@color/fab_selector"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/redo_fab"
+            style="@style/Theme.ArabicMathSolver.lowerFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/redo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/undo_fab"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_redo"
+            app:tint = "@color/fab_selector"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/move_fab"
+            style="@style/Theme.ArabicMathSolver.lowerFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/move_str"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/redo_fab"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_move" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/eraser_fab"
+            style="@style/Theme.ArabicMathSolver.lowerFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/move_str"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/move_fab"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_eraser" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/pen_fab"
+            style="@style/Theme.ArabicMathSolver.lowerFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/move_str"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/eraser_fab"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_pen" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

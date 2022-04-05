@@ -13,4 +13,9 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+    <style name="Theme.ArabicMathSolver.lowerFab" parent="Widget.Design.FloatingActionButton">
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="fabCustomSize">40dp</item>
+
+    </style>
 </resources>

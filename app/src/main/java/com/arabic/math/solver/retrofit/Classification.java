@@ -8,9 +8,9 @@ public class Classification {
     @SerializedName("error")
     @Expose
     private String error;
-    @SerializedName("equation")
+    @SerializedName("expression")
     @Expose
-    private String equation;
+    private String expression;
     @SerializedName("mapping")
     @Expose
     private String mapping;
@@ -19,11 +19,11 @@ public class Classification {
     private String solution;
 
     public String getEquation() {
-        return equation == null ?"":equation;
+        return expression == null ?"":expression;
     }
 
-    public void setEquation(String equation) {
-        this.equation = equation;
+    public void setExpression(String expression) {
+        this.expression = expression;
     }
 
     public String getMapping() {
