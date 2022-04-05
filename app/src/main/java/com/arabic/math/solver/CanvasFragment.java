@@ -29,6 +29,7 @@ import com.arabic.math.solver.drawview.DrawViewManager;
 import com.arabic.math.solver.drawview.DrawViewModes;
 import com.arabic.math.solver.retrofit.Classification;
 import com.arabic.math.solver.retrofit.Retrofiter;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
@@ -41,11 +42,11 @@ import retrofit2.Response;
 
 public class CanvasFragment extends Fragment {
     private View rootView;
-    private DrawViewManager drawViewManager ;
-    private static final String[] METHODS = new String[] {
-            "","polynomial","differentiate","integrate"
+    private DrawViewManager drawViewManager;
+    private static final String[] METHODS = new String[]{
+            "", "polynomial", "differentiate", "integrate"
     };
-    private int method_Selected ;
+    private int method_Selected;
     PermissionHandler<Map<String, Boolean>> multiPermissionsCallback = new PermissionHandler<>();
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), multiPermissionsCallback);
@@ -97,30 +98,52 @@ public class CanvasFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<Classification> call, @NonNull Throwable t) {
                 Log.e("Upload error:", t.getMessage());
-                Toast.makeText(requireContext(),"Upload error:"+ t.getMessage(),Toast.LENGTH_LONG).show();
+                Toast.makeText(requireContext(), "Upload error:" + t.getMessage(), Toast.LENGTH_LONG).show();
                 pred_textview.setText(R.string.pred_textview_str);
             }
         };
 
         initDrawView();
+        initBottomTools();
         // init methods list
-        ArrayAdapter <String> methods_adapter = new ArrayAdapter<>(requireContext(),R.layout.method_list_item,METHODS);
+        ArrayAdapter<String> methods_adapter = new ArrayAdapter<>(requireContext(), R.layout.method_list_item, METHODS);
         AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
         method_list.setAdapter(methods_adapter);
         method_Selected = 0;
-        method_list.setText(METHODS[method_Selected],false);
+        method_list.setText(METHODS[method_Selected], false);
 
+    }
+
+    private void initBottomTools() {
+        BottomNavigationView bottom_tools_nav = rootView.findViewById(R.id.bottom_tools_nav);
+        bottom_tools_nav.setSelectedItemId(R.id.pen_tool);
+        bottom_tools_nav.setOnItemSelectedListener(item -> {
+            int item_id = item.getItemId();
+            if (item_id == R.id.move_tool) {
+                drawViewManager.setMode(DrawViewModes.NONE);
+                return true ;
+            } else if (item_id == R.id.eraser_tool) {
+                drawViewManager.setMode(DrawViewModes.ERASE);
+                return true ;
+            }
+            else if (item_id == R.id.pen_tool) {
+                drawViewManager.setMode(DrawViewModes.DRAW);
+                return true ;
+            }
+            return false ;
+        });
     }
 
     private void uploadFile(File file) {
-        Retrofiter.upload_classify(file, classificationCallback,METHODS[method_Selected]);
+        Retrofiter.upload_classify(file, classificationCallback, METHODS[method_Selected]);
     }
+
     private void initDrawView() {
         DrawView paint = rootView.findViewById(R.id.draw_view);
-        FloatingActionButton undo,redo;
+        FloatingActionButton undo, redo;
         undo = rootView.findViewById(R.id.undo_fab);
         redo = rootView.findViewById(R.id.redo_fab);
-        this.drawViewManager = new DrawViewManager(paint).with(undo,redo);
+        this.drawViewManager = new DrawViewManager(paint).with(undo, redo);
         paint.setManager(drawViewManager);
         //pass the height and width of the custom view to the init method of the DrawView object
         ViewTreeObserver vto = paint.getViewTreeObserver();
@@ -135,16 +158,17 @@ public class CanvasFragment extends Fragment {
         });
 
     }
+
     private void setOnClickMethods() {
         AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
         ImageButton save, gallery;
-        FloatingActionButton  move,undo,redo;
+        FloatingActionButton move, undo, redo;
 
         undo = rootView.findViewById(R.id.undo_fab);
         redo = rootView.findViewById(R.id.redo_fab);
         save = rootView.findViewById(R.id.btn_save);
         gallery = rootView.findViewById(R.id.btn_gallery);
-        move = rootView.findViewById(R.id.move_fab);
+//        move = rootView.findViewById(R.id.move_fab);
         redo.setOnClickListener(view -> drawViewManager.redo());
         undo.setOnClickListener(view -> drawViewManager.undo());
         save.setOnClickListener(view -> {
@@ -155,7 +179,7 @@ public class CanvasFragment extends Fragment {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.INTERNET
                 };
-            }else {
+            } else {
                 permission_needed = new String[]{
                         Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.INTERNET
@@ -186,7 +210,7 @@ public class CanvasFragment extends Fragment {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startForResultFromGallery.launch(intent);
         });
-        move.setOnClickListener(view -> drawViewManager.setMode(drawViewManager.isMoveMode()? DrawViewModes.DRAW:DrawViewModes.NONE));
+//        move.setOnClickListener(view -> drawViewManager.setMode(drawViewManager.isMoveMode()? DrawViewModes.DRAW:DrawViewModes.NONE));
         method_list.setOnItemClickListener((parent, view, position, id) -> method_Selected = position);
     }
 }

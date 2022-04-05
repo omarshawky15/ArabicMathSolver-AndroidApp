@@ -8,4 +8,6 @@
     <string name="pred_textview_str">Equation :\nMapping :\nSolution :\nError : None</string>
     <string name="method">Method</string>
     <string name="redo">redo</string>
+    <string name="eraser_str">Eraser</string>
+    <string name="pen_str">Pen</string>
 </resources>

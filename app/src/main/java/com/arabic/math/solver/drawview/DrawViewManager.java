@@ -2,25 +2,28 @@ package com.arabic.math.solver.drawview;
 
 import android.graphics.Bitmap;
 import android.graphics.Path;
-import android.view.View;
 
-import com.arabic.math.solver.R;
+import androidx.core.util.Pair;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 
 public class DrawViewManager {
-    private final List<Path> backPaths ,forwardPaths;
+    private final List<Path> backwardPaths,forwardPaths;
+    private final List<Pair<Character,Pair<Integer,Path>>> previousCmd , nextCmd;
     private int mode;
     private final DrawView paint;
     private FloatingActionButton redoFab , undoFab;
     private int backwardSize ,forwardSize;
     public DrawViewManager(DrawView paint){
         mode = DrawViewModes.DRAW;
-        backPaths = new ArrayList<>();
+        backwardPaths = new ArrayList<>();
         forwardPaths = new ArrayList<>();
+        previousCmd = new ArrayList<>();
+        nextCmd = new ArrayList<>();
         backwardSize=0 ;
         forwardSize =0 ;
         mode= DrawViewModes.DRAW;
@@ -31,6 +34,9 @@ public class DrawViewManager {
         return mode < DrawViewModes.DRAW && mode >= DrawViewModes.NONE;
     }
 
+    public boolean isErase() {
+        return mode == DrawViewModes.ERASE;
+    }
     public void setMode(int mode) {
         this.mode = mode;
         paint.resetMatrices();
@@ -40,8 +46,9 @@ public class DrawViewManager {
         if (backwardSize!= 0) {
             backwardSize--;
             forwardSize++;
-            forwardPaths.add(backPaths.get(backwardSize));
-            backPaths.remove(backwardSize);
+            forwardPaths.add(backwardPaths.get(backwardSize));
+            backwardPaths.remove(backwardSize);
+//            previousCmd.add(new Pair<>('U',new Pair<>(backwardSize)))
             paint.invalidate();
         }
         resetUndoRedo();
@@ -52,7 +59,7 @@ public class DrawViewManager {
         if (forwardSize != 0) {
             forwardSize--;
             backwardSize++;
-            backPaths.add(forwardPaths.get(forwardSize));
+            backwardPaths.add(forwardPaths.get(forwardSize));
             forwardPaths.remove(forwardSize);
             paint.invalidate();
         }
@@ -68,12 +75,12 @@ public class DrawViewManager {
         redoFab.setEnabled(forwardSize != 0);
     }
 
-    public Iterator<Path> getBackPaths() {
-        return  backPaths.iterator();
+    public List<Path> getBackwardPaths() {
+        return  Collections.unmodifiableList(backwardPaths);
     }
 
-    public Iterator<Path> getForwardPaths() {
-        return forwardPaths.iterator();
+    public List<Path> getForwardPaths() {
+        return  Collections.unmodifiableList(forwardPaths);
     }
 
     public int getMode() {
@@ -92,10 +99,14 @@ public class DrawViewManager {
         return paint.save();
     }
 
-    public void addBack(Path mPath) {
-        backPaths.add(mPath);
+    public void push(Path mPath) {
+        backwardPaths.add(mPath);
         backwardSize++;
         resetUndoRedo();
+
+    }
+
+    public void pop(int i) {
 
     }
 }

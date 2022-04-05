@@ -76,10 +76,10 @@
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/utils_ll"
+        android:id="@+id/redo_undo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_tools_nav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -93,7 +93,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_undo"
-            app:tint="@color/fab_selector"/>
+            app:tint="@color/fab_selector" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/redo_fab"
@@ -105,42 +105,17 @@
             app:layout_constraintStart_toEndOf="@id/undo_fab"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_redo"
-            app:tint = "@color/fab_selector"/>
+            app:tint="@color/fab_selector" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/move_fab"
-            style="@style/Theme.ArabicMathSolver.lowerFab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/move_str"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/redo_fab"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_move" />
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/eraser_fab"
-            style="@style/Theme.ArabicMathSolver.lowerFab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/move_str"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/move_fab"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_eraser" />
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/pen_fab"
-            style="@style/Theme.ArabicMathSolver.lowerFab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/move_str"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/eraser_fab"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_pen" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+        android:id="@+id/bottom_tools_nav"
+        style="@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:menu="@menu/bottom_navigation_menu" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_tools_menu" />
 </androidx.constraintlayout.widget.ConstraintLayout>
