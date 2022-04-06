@@ -9,11 +9,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class DrawViewManager {
     private final List<Path> backwardPaths;
     private final List<Pair<Character, Pair<Integer, Path>>> previousCmd, nextCmd;
+    private final HashMap<Path,Integer> pathRefs ;
     private final DrawView paint;
     private FloatingActionButton redoFab, undoFab;
     private int mode;
@@ -22,6 +25,7 @@ public class DrawViewManager {
         mode = DrawViewModes.DRAW;
         backwardPaths = new ArrayList<>();
         previousCmd = new ArrayList<>();
+        pathRefs = new HashMap<>();
         nextCmd = new ArrayList<>();
         mode = DrawViewModes.DRAW;
         this.paint = paint;
@@ -68,6 +72,10 @@ public class DrawViewManager {
         }
     }
 
+    public Iterator<Path> getPathRefsIter() {
+        return pathRefs.keySet().iterator();
+    }
+
     public List<Path> getBackwardPaths() {
         return Collections.unmodifiableList(backwardPaths);
     }
@@ -88,26 +96,37 @@ public class DrawViewManager {
         return paint.save();
     }
 
-    public void push(Path mPath) {
+    protected void push(Path mPath) {
         previousCmd.add(new Pair<>(Commands.ADD, new Pair<>(backwardPaths.size(), mPath)));
         backwardPaths.add(mPath);
-        nextCmd.clear();
+        pathRefs.put(mPath,1);
+        clearNextCmd();
         resetUndoRedo();
     }
 
-    public void pop(int i) {
+    protected void pop(int i) {
         previousCmd.add(new Pair<>(Commands.DELETE, new Pair<>(i,backwardPaths.get(i) )));
+        pathRefs.put(backwardPaths.get(i),2);
         backwardPaths.remove(i);
-        nextCmd.clear();
+        clearNextCmd();
         resetUndoRedo();
     }
 
-    public void resetUndoRedo() {
+    private void resetUndoRedo() {
         undoFab.setEnabled(previousCmd.size() != 0);
         redoFab.setEnabled(nextCmd.size() != 0);
         paint.invalidate();
     }
-
+    private void clearNextCmd(){
+        for (Pair<Character, Pair<Integer, Path>> i : nextCmd){
+            int count = pathRefs.get(i.second.second);
+            if(count==1) {
+                pathRefs.remove(i.second.second);
+            }
+            else pathRefs.put(i.second.second,count-1);
+        }
+        nextCmd.clear();
+    }
     protected static class Commands {
         public static final char ADD = 'A';
         public static final char DELETE = 'D';

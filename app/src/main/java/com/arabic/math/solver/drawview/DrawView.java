@@ -14,6 +14,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class DrawView extends View {
@@ -87,8 +88,6 @@ public class DrawView extends View {
     }
 
     void resetMatrices() {
-        start.set(0, 0);
-        mid.set(0, 0);
         matrix.reset();
         inv.reset();
         savedMatrix.reset();
@@ -97,7 +96,8 @@ public class DrawView extends View {
     // this methods returns the current bitmap
     protected Bitmap save() {
         Matrix scaleMatrix = computeScaleMatrix();
-        drawAndScalePaths(scaleMatrix, new Matrix(), true);
+        scalePaths(scaleMatrix, new Matrix());
+        drawPaths();
         return mBitmap;
     }
 
@@ -115,14 +115,18 @@ public class DrawView extends View {
         return scaleMatrix;
     }
 
-    private void drawAndScalePaths(Matrix scaleMatrix, Matrix inverse, boolean doScale) {
+    private void scalePaths(Matrix scaleMatrix, Matrix inverse) {
+        for (Iterator<Path> it = manager.getPathRefsIter(); it.hasNext(); ) {
+            Path i = it.next();
+            i.transform(inverse);
+            i.transform(scaleMatrix);
+        }
+    }
+
+    private void drawPaths() {
         int backgroundColor = Color.WHITE;
         mCanvas.drawColor(backgroundColor);
         for (Path i : manager.getBackwardPaths()) {
-            if (doScale) {
-                i.transform(inverse);
-                i.transform(scaleMatrix);
-            }
             mCanvas.drawPath(i, mPaint);
         }
     }
@@ -132,7 +136,9 @@ public class DrawView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
-        drawAndScalePaths(matrix, inv, manager.isMoveMode());
+        if (manager.isMoveMode())
+            scalePaths(matrix, inv);
+        drawPaths();
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.restore();
     }
