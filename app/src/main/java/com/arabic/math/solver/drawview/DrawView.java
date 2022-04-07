@@ -105,10 +105,10 @@ public class DrawView extends View {
         RectF new_dim = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MIN_VALUE, Float.MIN_VALUE), tempRect = new RectF(), old_dim = new RectF(0, 0, getMeasuredWidth(), getMeasuredHeight());
         for (Path i : manager.getBackwardPaths()) {
             i.computeBounds(tempRect, false);
-            new_dim.left = Math.min(new_dim.left, tempRect.left);
-            new_dim.top = Math.min(new_dim.top, tempRect.top);
-            new_dim.bottom = Math.max(new_dim.bottom, tempRect.bottom);
-            new_dim.right = Math.max(new_dim.right, tempRect.right);
+            new_dim.left = Math.min(new_dim.left, tempRect.left-20);
+            new_dim.top = Math.min(new_dim.top, tempRect.top-20);
+            new_dim.bottom = Math.max(new_dim.bottom, tempRect.bottom+20);
+            new_dim.right = Math.max(new_dim.right, tempRect.right+20);
         }
         Matrix scaleMatrix = new Matrix();
         scaleMatrix.setRectToRect(new_dim, old_dim, Matrix.ScaleToFit.CENTER);

@@ -15,7 +15,7 @@ import java.util.List;
 
 public class DrawViewManager {
     private final List<Path> backwardPaths;
-    private final List<Pair<Character, Pair<Integer, Path>>> previousCmd, nextCmd;
+    private final List<Pair<Character, Path>> previousCmd, nextCmd;
     private final HashMap<Path,Integer> pathRefs ;
     private final DrawView paint;
     private FloatingActionButton redoFab, undoFab;
@@ -48,9 +48,9 @@ public class DrawViewManager {
         int idx = previousCmd.size() - 1;
         if (idx >= 0) {
             if (previousCmd.get(idx).first == Commands.DELETE) {
-                backwardPaths.add(previousCmd.get(idx).second.first, previousCmd.get(idx).second.second);
+                backwardPaths.add( previousCmd.get(idx).second);
             } else {
-                backwardPaths.remove((int) previousCmd.get(idx).second.first);
+                backwardPaths.remove( previousCmd.get(idx).second);
             }
             nextCmd.add(previousCmd.get(idx));
             previousCmd.remove(idx);
@@ -62,9 +62,9 @@ public class DrawViewManager {
         int idx = nextCmd.size() - 1;
         if (idx >= 0) {
             if (nextCmd.get(idx).first == Commands.ADD) {
-                backwardPaths.add(nextCmd.get(idx).second.first, nextCmd.get(idx).second.second);
+                backwardPaths.add(nextCmd.get(idx).second);
             } else {
-                backwardPaths.remove((int) nextCmd.get(idx).second.first);
+                backwardPaths.remove( nextCmd.get(idx).second);
             }
             previousCmd.add(nextCmd.get(idx));
             nextCmd.remove(idx);
@@ -97,18 +97,18 @@ public class DrawViewManager {
     }
 
     protected void push(Path mPath) {
-        previousCmd.add(new Pair<>(Commands.ADD, new Pair<>(backwardPaths.size(), mPath)));
+        clearNextCmd();
+        previousCmd.add(new Pair<>(Commands.ADD ,mPath));
         backwardPaths.add(mPath);
         pathRefs.put(mPath,1);
-        clearNextCmd();
         resetUndoRedo();
     }
 
     protected void pop(int i) {
-        previousCmd.add(new Pair<>(Commands.DELETE, new Pair<>(i,backwardPaths.get(i) )));
+        clearNextCmd();
+        previousCmd.add(new Pair<>(Commands.DELETE,backwardPaths.get(i) ));
         pathRefs.put(backwardPaths.get(i),2);
         backwardPaths.remove(i);
-        clearNextCmd();
         resetUndoRedo();
     }
 
@@ -118,12 +118,12 @@ public class DrawViewManager {
         paint.invalidate();
     }
     private void clearNextCmd(){
-        for (Pair<Character, Pair<Integer, Path>> i : nextCmd){
-            int count = pathRefs.get(i.second.second);
+        for (Pair<Character, Path> i : nextCmd){
+            int count = pathRefs.get(i.second);
             if(count==1) {
-                pathRefs.remove(i.second.second);
+                pathRefs.remove(i.second);
             }
-            else pathRefs.put(i.second.second,count-1);
+            else pathRefs.put(i.second,count-1);
         }
         nextCmd.clear();
     }
