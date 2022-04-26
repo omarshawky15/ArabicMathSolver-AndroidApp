@@ -1,6 +1,7 @@
 package com.arabic.math.solver.drawview;
 
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.Path;
 
 import androidx.core.util.Pair;
@@ -14,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class DrawViewManager {
-    private final List<Path> backwardPaths;
+    private final List<Path> drawnPaths;
     private final List<Pair<Character, Path>> previousCmd, nextCmd;
     private final HashMap<Path,Integer> pathRefs ;
     private final DrawView paint;
@@ -23,7 +24,7 @@ public class DrawViewManager {
 
     public DrawViewManager(DrawView paint) {
         mode = DrawViewModes.DRAW;
-        backwardPaths = new ArrayList<>();
+        drawnPaths = new ArrayList<>();
         previousCmd = new ArrayList<>();
         pathRefs = new HashMap<>();
         nextCmd = new ArrayList<>();
@@ -31,8 +32,15 @@ public class DrawViewManager {
         this.paint = paint;
     }
 
+    public void scalePaths(Matrix scaleMatrix, Matrix inverse) {
+        for (Iterator<Path> it = getPathRefsIter(); it.hasNext(); ) {
+            Path i = it.next();
+            i.transform(inverse);
+            i.transform(scaleMatrix);
+        }
+    }
     public boolean isMoveMode() {
-        return mode < DrawViewModes.DRAW && mode >= DrawViewModes.NONE;
+        return mode == DrawViewModes.MOVE;
     }
 
     public boolean isErase() {
@@ -41,16 +49,16 @@ public class DrawViewManager {
 
     public void setMode(int mode) {
         this.mode = mode;
-        paint.resetMatrices();
+//        paint.resetMatrices();
     }
 
     public void undo() {
         int idx = previousCmd.size() - 1;
         if (idx >= 0) {
             if (previousCmd.get(idx).first == Commands.DELETE) {
-                backwardPaths.add( previousCmd.get(idx).second);
+                drawnPaths.add( previousCmd.get(idx).second);
             } else {
-                backwardPaths.remove( previousCmd.get(idx).second);
+                drawnPaths.remove( previousCmd.get(idx).second);
             }
             nextCmd.add(previousCmd.get(idx));
             previousCmd.remove(idx);
@@ -62,9 +70,9 @@ public class DrawViewManager {
         int idx = nextCmd.size() - 1;
         if (idx >= 0) {
             if (nextCmd.get(idx).first == Commands.ADD) {
-                backwardPaths.add(nextCmd.get(idx).second);
+                drawnPaths.add(nextCmd.get(idx).second);
             } else {
-                backwardPaths.remove( nextCmd.get(idx).second);
+                drawnPaths.remove( nextCmd.get(idx).second);
             }
             previousCmd.add(nextCmd.get(idx));
             nextCmd.remove(idx);
@@ -76,8 +84,8 @@ public class DrawViewManager {
         return pathRefs.keySet().iterator();
     }
 
-    public List<Path> getBackwardPaths() {
-        return Collections.unmodifiableList(backwardPaths);
+    public List<Path> getDrawnPaths() {
+        return Collections.unmodifiableList(drawnPaths);
     }
 
     public int getMode() {
@@ -96,19 +104,19 @@ public class DrawViewManager {
         return paint.save();
     }
 
-    protected void push(Path mPath) {
+    public void push(Path mPath) {
         clearNextCmd();
         previousCmd.add(new Pair<>(Commands.ADD ,mPath));
-        backwardPaths.add(mPath);
+        drawnPaths.add(mPath);
         pathRefs.put(mPath,1);
         resetUndoRedo();
     }
 
-    protected void pop(int i) {
+    public void pop(int i) {
         clearNextCmd();
-        previousCmd.add(new Pair<>(Commands.DELETE,backwardPaths.get(i) ));
-        pathRefs.put(backwardPaths.get(i),2);
-        backwardPaths.remove(i);
+        previousCmd.add(new Pair<>(Commands.DELETE, drawnPaths.get(i) ));
+        pathRefs.put(drawnPaths.get(i),2);
+        drawnPaths.remove(i);
         resetUndoRedo();
     }
 

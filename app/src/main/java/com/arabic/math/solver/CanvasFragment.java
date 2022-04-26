@@ -120,7 +120,7 @@ public class CanvasFragment extends Fragment {
         bottom_tools_nav.setOnItemSelectedListener(item -> {
             int item_id = item.getItemId();
             if (item_id == R.id.move_tool) {
-                drawViewManager.setMode(DrawViewModes.NONE);
+                drawViewManager.setMode(DrawViewModes.MOVE);
                 return true;
             } else if (item_id == R.id.eraser_tool) {
                 drawViewManager.setMode(DrawViewModes.ERASE);
@@ -144,7 +144,7 @@ public class CanvasFragment extends Fragment {
         redo = rootView.findViewById(R.id.redo_fab);
         this.drawViewManager = new DrawViewManager(paint).with(undo, redo);
         paint.setManager(drawViewManager);
-        //pass the height and width of the custom view to the init method of the DrawView object
+
         ViewTreeObserver vto = paint.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
