@@ -26,13 +26,13 @@ public class DrawView extends View {
     private DrawViewManager manager;
     private final Map<Integer, ActionHandler> actionHandlers ;
 
-    private final int DEFAULT_COLOR = Color.BLACK;
-    private final int DEFAULT_STROKE = 10;
-    private final int ALPHA = 0xff;
+    private final int DEFAULT_COLOR = Color.BLACK, GRID_COLOR = Color.GRAY;
+    private final int DEFAULT_STROKE = 10, GRID_STROKE = 1;
+    private final int DEFAULT_ALPHA = 0xff, GRID_ALPHA =0x80;
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private Paint mBitmapPaint;
-    private final Paint mPaint;
+    private final Paint pathPaint , gridPaint;
 
 
     public DrawView(Context context) {
@@ -44,15 +44,25 @@ public class DrawView extends View {
         actionHandlers =new HashMap<>() ;
         // the below methods smoothens
         // the drawings of the user
-        mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setDither(true);
-        mPaint.setColor(DEFAULT_COLOR);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setAlpha(ALPHA);
-        mPaint.setStrokeWidth(DEFAULT_STROKE);
+        pathPaint = new Paint();
+        pathPaint.setAntiAlias(true);
+        pathPaint.setDither(true);
+        pathPaint.setColor(DEFAULT_COLOR);
+        pathPaint.setStyle(Paint.Style.STROKE);
+        pathPaint.setStrokeJoin(Paint.Join.ROUND);
+        pathPaint.setStrokeCap(Paint.Cap.ROUND);
+        pathPaint.setAlpha(DEFAULT_ALPHA);
+        pathPaint.setStrokeWidth(DEFAULT_STROKE);
+
+        gridPaint = new Paint();
+        gridPaint.setAntiAlias(true);
+        gridPaint.setDither(true);
+        gridPaint.setColor(GRID_COLOR);
+        gridPaint.setAlpha(GRID_ALPHA);
+        gridPaint.setStrokeWidth(GRID_STROKE);
+        gridPaint.setStyle(Paint.Style.STROKE);
+        gridPaint.setStrokeJoin(Paint.Join.ROUND);
+        gridPaint.setStrokeCap(Paint.Cap.ROUND);
 
 //        manager = new DrawViewManager(this); //TODO to be considered later
     }
@@ -76,6 +86,7 @@ public class DrawView extends View {
     protected Bitmap save() {
         Matrix scaleMatrix = computeScaleMatrix();
         manager.scalePaths(scaleMatrix, new Matrix());
+        mCanvas.drawColor(Color.WHITE);
         drawPaths();
         return mBitmap;
     }
@@ -95,19 +106,29 @@ public class DrawView extends View {
     }
 
     private void drawPaths() {
-        int backgroundColor = Color.WHITE;
-        mCanvas.drawColor(backgroundColor);
         for (Path i : manager.getDrawnPaths()) {
-            mCanvas.drawPath(i, mPaint);
+            mCanvas.drawPath(i, pathPaint);
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
+        mCanvas.drawColor(Color.WHITE);
+        drawGridLines();
         drawPaths();
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.restore();
+    }
+
+    private void drawGridLines() {
+        int canvasWidth = getMeasuredWidth(), canvasHeight = getMeasuredHeight();
+        float gridSize = 30f;
+        float pad = Math.max(getMeasuredHeight(), getMeasuredWidth()) / gridSize;
+        for (int j = 0; j <= Math.max(canvasWidth, canvasHeight); j += (int)pad) {
+            mCanvas.drawLine(0, j, canvasWidth, j, gridPaint);
+            mCanvas.drawLine(j, 0, j, canvasHeight, gridPaint);
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
