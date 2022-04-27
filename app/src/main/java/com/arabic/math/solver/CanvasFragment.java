@@ -30,6 +30,7 @@ import com.arabic.math.solver.drawview.DrawViewModes;
 import com.arabic.math.solver.retrofit.Classification;
 import com.arabic.math.solver.retrofit.Retrofiter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
@@ -105,6 +106,7 @@ public class CanvasFragment extends Fragment {
 
         initDrawView();
         initBottomTools();
+        initBottomNavDrawer();
         // init methods list
         ArrayAdapter<String> methods_adapter = new ArrayAdapter<>(requireContext(), R.layout.method_list_item, METHODS);
         AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
@@ -112,6 +114,11 @@ public class CanvasFragment extends Fragment {
         method_Selected = 0;
         method_list.setText(METHODS[method_Selected], false);
 
+    }
+
+    private void initBottomNavDrawer() {
+        BottomSheetBehavior<View> nav = BottomSheetBehavior.from(rootView.findViewById(R.id.bottom_methods_nav));
+        nav.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     private void initBottomTools() {
@@ -167,6 +174,7 @@ public class CanvasFragment extends Fragment {
         redo = rootView.findViewById(R.id.redo_fab);
         save = rootView.findViewById(R.id.btn_save);
         gallery = rootView.findViewById(R.id.btn_gallery);
+        BottomSheetBehavior<View> nav = BottomSheetBehavior.from(rootView.findViewById(R.id.bottom_methods_nav));
         redo.setOnClickListener(view -> drawViewManager.redo());
         undo.setOnClickListener(view -> drawViewManager.undo());
         save.setOnClickListener(view -> {
@@ -206,7 +214,8 @@ public class CanvasFragment extends Fragment {
         });
         gallery.setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startForResultFromGallery.launch(intent);
+//            startForResultFromGallery.launch(intent);
+            nav.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
         });
         method_list.setOnItemClickListener((parent, view, position, id) -> method_Selected = position);
     }
