@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.arabic.math.solver.drawview.DrawView;
@@ -121,22 +123,30 @@ public class CanvasFragment extends Fragment {
         NavigationView bottomNavDrawer = rootView.findViewById(R.id.bottom_methods_nav);
         BottomSheetBehavior<View> navBehavior = BottomSheetBehavior.from(bottomNavDrawer);
         FloatingActionButton methodsFab = rootView.findViewById(R.id.methods_fab);
+        FrameLayout scrim = rootView.findViewById(R.id.scrim);
         navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomNavDrawer.setNavigationItemSelectedListener(item -> {
-//            MenuItem prev_item = bottomNavDrawer.getCheckedItem();
             methodSelected = item.getTitle().toString();
-//            if(prev_item !=null)
-//                prev_item.setChecked(false);
             item.setChecked(true);
-//            bottomNavDrawer.setCheckedItem(item);
+            methodsFab.setImageDrawable(item.getIcon());
             navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            scrim.setVisibility(View.GONE);
             return true;
         });
-        methodsFab.setOnClickListener(v -> navBehavior.setState(BottomSheetBehavior.STATE_EXPANDED));
+        methodsFab.setOnClickListener(v -> {
+            navBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            scrim.setVisibility(View.VISIBLE);
+        });
         MenuItem defaultItem = bottomNavDrawer.getMenu().getItem(0);
         defaultItem.setChecked(true);
+        methodsFab.setImageDrawable(defaultItem.getIcon());
         methodSelected = defaultItem.getTitle().toString();
         bottomNavDrawer.setCheckedItem(defaultItem);
+
+        scrim.setOnClickListener(view -> {
+            navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            scrim.setVisibility(View.GONE);
+        });
     }
 
     private void initBottomTools() {
