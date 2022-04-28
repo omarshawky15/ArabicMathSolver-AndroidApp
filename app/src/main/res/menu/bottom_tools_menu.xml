@@ -6,17 +6,17 @@
         android:enabled="true"
         android:icon="@drawable/ic_move"
         android:title="@string/move_str"
-        app:labelVisibilityMode = "unlabeled"/>
+        app:showAsAction="always"/>
     <item
         android:id="@+id/eraser_tool"
         android:enabled="true"
         android:icon="@drawable/ic_eraser"
         android:title="@string/eraser_str"
-        app:labelVisibilityMode = "unlabeled"/>
+        app:showAsAction="always"/>
     <item
         android:id="@+id/pen_tool"
         android:enabled="true"
         android:icon="@drawable/ic_pen"
         android:title="@string/pen_str"
-        app:labelVisibilityMode = "unlabeled"/>
+        app:showAsAction="always"/>
 </menu>

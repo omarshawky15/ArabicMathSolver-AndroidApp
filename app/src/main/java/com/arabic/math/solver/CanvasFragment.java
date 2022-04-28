@@ -9,11 +9,10 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +31,7 @@ import com.arabic.math.solver.retrofit.Retrofiter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
 import java.util.Map;
@@ -47,7 +47,8 @@ public class CanvasFragment extends Fragment {
     private static final String[] METHODS = new String[]{
             "", "polynomial", "differentiate", "integrate"
     };
-    private int method_Selected;
+    private int methodSelectedIdx;
+    private String methodSelected ;
     PermissionHandler<Map<String, Boolean>> multiPermissionsCallback = new PermissionHandler<>();
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), multiPermissionsCallback);
@@ -108,17 +109,34 @@ public class CanvasFragment extends Fragment {
         initBottomTools();
         initBottomNavDrawer();
         // init methods list
-        ArrayAdapter<String> methods_adapter = new ArrayAdapter<>(requireContext(), R.layout.method_list_item, METHODS);
-        AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
-        method_list.setAdapter(methods_adapter);
-        method_Selected = 0;
-        method_list.setText(METHODS[method_Selected], false);
+//        ArrayAdapter<String> methods_adapter = new ArrayAdapter<>(requireContext(), R.layout.method_list_item, METHODS);
+//        AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
+//        method_list.setAdapter(methods_adapter);
+//        method_Selected = 0;
+//        method_list.setText(METHODS[method_Selected], false);
 
     }
 
     private void initBottomNavDrawer() {
-        BottomSheetBehavior<View> nav = BottomSheetBehavior.from(rootView.findViewById(R.id.bottom_methods_nav));
-        nav.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        NavigationView bottomNavDrawer = rootView.findViewById(R.id.bottom_methods_nav);
+        BottomSheetBehavior<View> navBehavior = BottomSheetBehavior.from(bottomNavDrawer);
+        FloatingActionButton methodsFab = rootView.findViewById(R.id.methods_fab);
+        navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomNavDrawer.setNavigationItemSelectedListener(item -> {
+//            MenuItem prev_item = bottomNavDrawer.getCheckedItem();
+            methodSelected = item.getTitle().toString();
+//            if(prev_item !=null)
+//                prev_item.setChecked(false);
+            item.setChecked(true);
+//            bottomNavDrawer.setCheckedItem(item);
+            navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            return true;
+        });
+        methodsFab.setOnClickListener(v -> navBehavior.setState(BottomSheetBehavior.STATE_EXPANDED));
+        MenuItem defaultItem = bottomNavDrawer.getMenu().getItem(0);
+        defaultItem.setChecked(true);
+        methodSelected = defaultItem.getTitle().toString();
+        bottomNavDrawer.setCheckedItem(defaultItem);
     }
 
     private void initBottomTools() {
@@ -141,7 +159,7 @@ public class CanvasFragment extends Fragment {
     }
 
     private void uploadFile(File file) {
-        Retrofiter.upload_classify(file, classificationCallback, METHODS[method_Selected]);
+        Retrofiter.upload_classify(file, classificationCallback, methodSelected.toLowerCase());
     }
 
     private void initDrawView() {
@@ -166,7 +184,7 @@ public class CanvasFragment extends Fragment {
     }
 
     private void setOnClickMethods() {
-        AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
+//        AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
         ImageButton save, gallery;
         FloatingActionButton undo, redo;
 
@@ -174,7 +192,6 @@ public class CanvasFragment extends Fragment {
         redo = rootView.findViewById(R.id.redo_fab);
         save = rootView.findViewById(R.id.btn_save);
         gallery = rootView.findViewById(R.id.btn_gallery);
-        BottomSheetBehavior<View> nav = BottomSheetBehavior.from(rootView.findViewById(R.id.bottom_methods_nav));
         redo.setOnClickListener(view -> drawViewManager.redo());
         undo.setOnClickListener(view -> drawViewManager.undo());
         save.setOnClickListener(view -> {
@@ -214,9 +231,8 @@ public class CanvasFragment extends Fragment {
         });
         gallery.setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//            startForResultFromGallery.launch(intent);
-            nav.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+            startForResultFromGallery.launch(intent);
         });
-        method_list.setOnItemClickListener((parent, view, position, id) -> method_Selected = position);
+//        method_list.setOnItemClickListener((parent, view, position, id) -> method_Selected = position);
     }
 }

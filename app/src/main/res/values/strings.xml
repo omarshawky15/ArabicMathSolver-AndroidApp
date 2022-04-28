@@ -10,4 +10,8 @@
     <string name="redo">redo</string>
     <string name="eraser_str">Eraser</string>
     <string name="pen_str">Pen</string>
+    <string name="simplify_str">Simplify</string>
+    <string name="polynomial_str">Polynomial</string>
+    <string name="differentiate_str">"Differentiate "</string>
+    <string name="integrate_str">Integrate</string>
 </resources>

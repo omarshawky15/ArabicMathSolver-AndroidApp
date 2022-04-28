@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:checkableBehavior="single" >
+    <item
+        android:id="@+id/simplify_method"
+        android:enabled="true"
+        android:icon="@drawable/ic_move"
+        android:title="@string/simplify_str" />
+    <item
+        android:id="@+id/polynomial_method"
+        android:enabled="true"
+        android:icon="@drawable/ic_move"
+        android:title="@string/polynomial_str" />
+    <item
+        android:id="@+id/differentiate_method"
+        android:enabled="true"
+        android:icon="@drawable/ic_move"
+        android:title="@string/differentiate_str" />
+    <item
+        android:id="@+id/integrate_method"
+        android:enabled="true"
+        android:icon="@drawable/ic_move"
+        android:title="@string/integrate_str" />
+    </group>
+</menu>
