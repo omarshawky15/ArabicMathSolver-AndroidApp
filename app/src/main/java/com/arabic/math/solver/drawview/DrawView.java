@@ -29,6 +29,7 @@ public class DrawView extends View {
     private final int DEFAULT_COLOR = Color.BLACK, GRID_COLOR = Color.GRAY;
     private final int DEFAULT_STROKE = 10, GRID_STROKE = 1;
     private final int DEFAULT_ALPHA = 0xff, GRID_ALPHA =0x80;
+    private final int SAVE_PADDING = 30 ;
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private Paint mBitmapPaint;
@@ -86,8 +87,10 @@ public class DrawView extends View {
     protected Bitmap save() {
         Matrix scaleMatrix = computeScaleMatrix();
         manager.scalePaths(scaleMatrix, new Matrix());
-        mCanvas.drawColor(Color.WHITE);
-        drawPaths();
+        Bitmap tempBitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        Canvas tempCanvas = new Canvas(tempBitmap);
+        drawPaths(tempCanvas);
+        invalidate();
         return mBitmap;
     }
 
@@ -95,19 +98,19 @@ public class DrawView extends View {
         RectF new_dim = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MIN_VALUE, Float.MIN_VALUE), tempRect = new RectF(), old_dim = new RectF(0, 0, getMeasuredWidth(), getMeasuredHeight());
         for (Path i : manager.getDrawnPaths()) {
             i.computeBounds(tempRect, false);
-            new_dim.left = Math.min(new_dim.left, tempRect.left-20);
-            new_dim.top = Math.min(new_dim.top, tempRect.top-20);
-            new_dim.bottom = Math.max(new_dim.bottom, tempRect.bottom+20);
-            new_dim.right = Math.max(new_dim.right, tempRect.right+20);
+            new_dim.left = Math.min(new_dim.left, tempRect.left-SAVE_PADDING);
+            new_dim.top = Math.min(new_dim.top, tempRect.top-SAVE_PADDING);
+            new_dim.bottom = Math.max(new_dim.bottom, tempRect.bottom+SAVE_PADDING);
+            new_dim.right = Math.max(new_dim.right, tempRect.right+SAVE_PADDING);
         }
         Matrix scaleMatrix = new Matrix();
         scaleMatrix.setRectToRect(new_dim, old_dim, Matrix.ScaleToFit.CENTER);
         return scaleMatrix;
     }
 
-    private void drawPaths() {
+    private void drawPaths(Canvas canvas) {
         for (Path i : manager.getDrawnPaths()) {
-            mCanvas.drawPath(i, pathPaint);
+            canvas.drawPath(i, pathPaint);
         }
     }
 
@@ -116,7 +119,7 @@ public class DrawView extends View {
         canvas.save();
         mCanvas.drawColor(Color.WHITE);
         drawGridLines();
-        drawPaths();
+        drawPaths(mCanvas);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.restore();
     }

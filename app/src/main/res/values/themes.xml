@@ -24,21 +24,12 @@
     </style>
 
     <style name="Widget.App.NavigationView" parent="Widget.MaterialComponents.BottomSheet.Modal">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.NavigationView</item>
         <item name="itemIconTint">@color/bottomsheet_item_selector</item>
         <item name="itemTextColor">@color/bottomsheet_item_selector</item>
         <item name="itemShapeFillColor">@color/bottomsheet_background_selector</item>
+        <item name="android:background">@color/white</item>
     </style>
 
-    <style name="ThemeOverlay.App.NavigationView" parent="">
-<!--        <item name="colorPrimary">@color/shrine_pink_100</item>-->
-<!--        <item name="colorSurface">@color/shrine_pink_50</item>-->
-<!--        <item name="colorOnSurface">@color/shrine_pink_900</item>-->
-<!--        <item name="textAppearanceHeadline6">@style/TextAppearance.App.Headline6</item>-->
-<!--        <item name="textAppearanceSubtitle2">@style/TextAppearance.App.Subtitle2</item>-->
-<!--        <item name="textAppearanceBody2">@style/TextAppearance.App.Body2</item>-->
-<!--        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.App.SmallComponent</item>-->
-    </style>
 
 
 </resources>

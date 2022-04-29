@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +21,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.arabic.math.solver.drawview.DrawView;
@@ -110,43 +108,50 @@ public class CanvasFragment extends Fragment {
         initDrawView();
         initBottomTools();
         initBottomNavDrawer();
-        // init methods list
-//        ArrayAdapter<String> methods_adapter = new ArrayAdapter<>(requireContext(), R.layout.method_list_item, METHODS);
-//        AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
-//        method_list.setAdapter(methods_adapter);
-//        method_Selected = 0;
-//        method_list.setText(METHODS[method_Selected], false);
-
     }
 
     private void initBottomNavDrawer() {
         NavigationView bottomNavDrawer = rootView.findViewById(R.id.bottom_methods_nav);
-        BottomSheetBehavior<View> navBehavior = BottomSheetBehavior.from(bottomNavDrawer);
+        BottomSheetBehavior<View> navBehavior = BottomSheetBehavior.from(rootView.findViewById(R.id.bottom_sheet_behavior_id));
         FloatingActionButton methodsFab = rootView.findViewById(R.id.methods_fab);
-        FrameLayout scrim = rootView.findViewById(R.id.scrim);
+        View scrim = rootView.findViewById(R.id.scrim);
         navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        bottomNavDrawer.setNavigationItemSelectedListener(item -> {
-            methodSelected = item.getTitle().toString();
-            item.setChecked(true);
-            methodsFab.setImageDrawable(item.getIcon());
-            navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-            scrim.setVisibility(View.GONE);
-            return true;
-        });
-        methodsFab.setOnClickListener(v -> {
-            navBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            scrim.setVisibility(View.VISIBLE);
-        });
+
         MenuItem defaultItem = bottomNavDrawer.getMenu().getItem(0);
         defaultItem.setChecked(true);
         methodsFab.setImageDrawable(defaultItem.getIcon());
         methodSelected = defaultItem.getTitle().toString();
         bottomNavDrawer.setCheckedItem(defaultItem);
 
+        bottomNavDrawer.setNavigationItemSelectedListener(item -> {
+            methodSelected = item.getTitle().toString();
+            item.setChecked(true);
+            methodsFab.setImageDrawable(item.getIcon());
+            navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            return true;
+        });
+        methodsFab.setOnClickListener(v -> {
+            navBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        });
+
+
         scrim.setOnClickListener(view -> {
             navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-            scrim.setVisibility(View.GONE);
         });
+
+        navBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                scrim.setVisibility(newState==BottomSheetBehavior.STATE_HIDDEN?View.GONE:View.VISIBLE);
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
+
     }
 
     private void initBottomTools() {
