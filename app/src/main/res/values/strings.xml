@@ -14,4 +14,6 @@
     <string name="polynomial_str">Polynomial</string>
     <string name="differentiate_str">"Differentiate "</string>
     <string name="integrate_str">Integrate</string>
+    <string name="bottom_desc_str">choose a method to apply to the equation</string>
+    <string name="bottom_title_str">Methods</string>
 </resources>

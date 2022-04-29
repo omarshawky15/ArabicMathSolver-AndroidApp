@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/pred_textview_str"
+        android:fontFamily="@font/myfont_regular_1"
         android:textAlignment="textStart"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@id/linearLayout2"
@@ -26,7 +27,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pred_textview">
+        app:layout_constraintTop_toBottomOf="@id/pred_textview"
+        android:elevation="1dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -60,22 +62,24 @@
             android:layout_height="match_parent" />
 
     </LinearLayout>
+
     <View
         android:id="@+id/scrim"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha="0.3"
         android:background="@android:color/darker_gray"
-        android:elevation="2dp"
+        android:elevation="3dp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/bottom_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/bottom_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:elevation="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -92,11 +96,11 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:contentDescription="@string/undo_str"
+            android:elevation="1dp"
             app:layout_anchor="@id/bottom_tools_nav"
             app:layout_anchorGravity="top|end"
             app:srcCompat="@drawable/ic_undo"
-            app:tint="@color/fab_selector"
-            android:elevation="1dp" />
+            app:tint="@color/fab_selector" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/undo_fab"
@@ -109,7 +113,6 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:contentDescription="@string/undo_str"
-            android:translationY="-10dp"
             app:layout_anchor="@id/bottom_tools_nav"
             app:layout_anchorGravity="top|start"
             app:srcCompat="@drawable/ic_undo"
@@ -137,7 +140,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
+            app:layout_insetEdge="bottom"
             app:menu="@menu/bottom_tools_menu" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
             android:id="@+id/bottom_sheet_behavior_id"
@@ -147,26 +160,29 @@
             android:elevation="8dp"
             android:orientation="vertical"
             app:behavior_hideable="true"
-            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+            app:layout_behavior="@string/bottom_sheet_behavior">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Methods"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/bottom_title_str"
                 android:textAlignment="textStart"
                 android:textColor="@color/black"
                 android:textSize="25sp"
                 android:textStyle="bold"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"/>
+                android:fontFamily="@font/myfont_regular_1" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="choose a method to apply to the equation"
+                android:layout_marginStart="15dp"
+                android:text="@string/bottom_desc_str"
                 android:textAlignment="textStart"
                 android:textSize="15sp"
-                android:layout_marginStart="15dp"/>
+                android:fontFamily="@font/myfont_regular_1"
+                />
 
             <com.google.android.material.navigation.NavigationView
                 android:id="@+id/bottom_methods_nav"
@@ -175,9 +191,5 @@
                 android:layout_height="wrap_content"
                 app:menu="@menu/methods_menu" />
         </LinearLayout>
-
-        <!--        app:behavior_hideable="true"-->
-        <!--        app:layout_behavior="@string/bottom_sheet_behavior"-->
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

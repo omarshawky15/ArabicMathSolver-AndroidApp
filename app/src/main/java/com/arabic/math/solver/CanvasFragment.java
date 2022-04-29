@@ -48,7 +48,7 @@ public class CanvasFragment extends Fragment {
             "", "polynomial", "differentiate", "integrate"
     };
     private int methodSelectedIdx;
-    private String methodSelected ;
+    private String methodSelected;
     PermissionHandler<Map<String, Boolean>> multiPermissionsCallback = new PermissionHandler<>();
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), multiPermissionsCallback);
@@ -142,8 +142,7 @@ public class CanvasFragment extends Fragment {
         navBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                scrim.setVisibility(newState==BottomSheetBehavior.STATE_HIDDEN?View.GONE:View.VISIBLE);
-
+                scrim.setVisibility(newState == BottomSheetBehavior.STATE_HIDDEN ? View.GONE : View.VISIBLE);
             }
 
             @Override
