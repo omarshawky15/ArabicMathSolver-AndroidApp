@@ -2,14 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:checkableBehavior="single">
+        <!-- If you add any method here
+        be sure to add to "getMethodNameFromItem" method in CanvasFragment for it to work-->
         <item
             android:id="@+id/simplify_method"
             android:enabled="true"
             android:icon="@drawable/ic_move"
-            android:title="@string/simplify_str"
-            />
+            android:title="@string/simplify_str" />
         <item
             android:id="@+id/polynomial_method"
+            android:contentDescription="@string/polynomial_str"
             android:enabled="true"
             android:icon="@drawable/ic_move"
             android:title="@string/polynomial_str" />

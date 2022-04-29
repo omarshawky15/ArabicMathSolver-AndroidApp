@@ -6,7 +6,6 @@
     <string name="gallery_str">Gallery</string>
     <string name="move_str">Move</string>
     <string name="pred_textview_str">Equation :\nMapping :\nSolution :\nError :</string>
-    <string name="method">Method</string>
     <string name="redo">redo</string>
     <string name="eraser_str">Eraser</string>
     <string name="pen_str">Pen</string>
@@ -14,6 +13,6 @@
     <string name="polynomial_str">Polynomial</string>
     <string name="differentiate_str">"Differentiate "</string>
     <string name="integrate_str">Integrate</string>
-    <string name="bottom_desc_str">choose a method to apply to the equation</string>
+    <string name="bottom_desc_str">Choose a method to apply to the equation</string>
     <string name="bottom_title_str">Methods</string>
 </resources>

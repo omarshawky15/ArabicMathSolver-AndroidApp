@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:name=".CanvasFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -10,8 +9,8 @@
         android:id="@+id/pred_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/pred_textview_str"
         android:fontFamily="@font/myfont_regular_1"
+        android:text="@string/pred_textview_str"
         android:textAlignment="textStart"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@id/linearLayout2"
@@ -23,12 +22,12 @@
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:elevation="1dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pred_textview"
-        android:elevation="1dp">
+        app:layout_constraintTop_toBottomOf="@id/pred_textview">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -167,22 +166,23 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:fontFamily="@font/myfont_regular_1"
                 android:text="@string/bottom_title_str"
                 android:textAlignment="textStart"
                 android:textColor="@color/black"
                 android:textSize="25sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/myfont_regular_1" />
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:fontFamily="@font/myfont_regular_1"
                 android:text="@string/bottom_desc_str"
                 android:textAlignment="textStart"
-                android:textSize="15sp"
-                android:fontFamily="@font/myfont_regular_1"
-                />
+                android:textSize="15sp" />
 
             <com.google.android.material.navigation.NavigationView
                 android:id="@+id/bottom_methods_nav"

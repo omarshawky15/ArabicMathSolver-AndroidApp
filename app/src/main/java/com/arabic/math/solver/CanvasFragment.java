@@ -2,7 +2,10 @@ package com.arabic.math.solver;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,6 +37,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -124,7 +128,8 @@ public class CanvasFragment extends Fragment {
         bottomNavDrawer.setCheckedItem(defaultItem);
 
         bottomNavDrawer.setNavigationItemSelectedListener(item -> {
-            methodSelected = item.getTitle().toString();
+            methodSelected = Locale.getDefault().getLanguage().equals("en") ? item.getTitle().toString() : getMethodNameFromItem(item);
+            Log.e("title", methodSelected);
             item.setChecked(true);
             methodsFab.setImageDrawable(item.getIcon());
             navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -153,6 +158,27 @@ public class CanvasFragment extends Fragment {
 
     }
 
+    //TODO find a cleaner way to do it !!
+    private String getMethodNameFromItem(MenuItem item) {
+        int id = item.getItemId();
+        Configuration conf = requireContext().getResources().getConfiguration();
+        conf = new Configuration(conf);
+        conf.setLocale(new Locale("en"));
+        Context localizedContext = requireContext().createConfigurationContext(conf);
+        Resources res = localizedContext.getResources();
+        String methodName = "";
+        if (id == R.id.simplify_method) {
+            methodName = res.getString(R.string.simplify_str);
+        } else if (id == R.id.polynomial_method) {
+            methodName = res.getString(R.string.polynomial_str);
+        } else if (id == R.id.differentiate_method) {
+            methodName = res.getString(R.string.differentiate_str);
+        } else if (id == R.id.integrate_method) {
+            methodName = res.getString(R.string.integrate_str);
+        }
+        return methodName;
+    }
+
     private void initBottomTools() {
         BottomNavigationView bottom_tools_nav = rootView.findViewById(R.id.bottom_tools_nav);
         bottom_tools_nav.setSelectedItemId(R.id.pen_tool);
@@ -170,10 +196,6 @@ public class CanvasFragment extends Fragment {
             }
             return false;
         });
-    }
-
-    private void uploadFile(File file) {
-        Retrofiter.upload_classify(file, classificationCallback, methodSelected.toLowerCase());
     }
 
     private void initDrawView() {
@@ -198,7 +220,6 @@ public class CanvasFragment extends Fragment {
     }
 
     private void setOnClickMethods() {
-//        AutoCompleteTextView method_list = rootView.findViewById(R.id.method_menu_autocomplete);
         ImageButton save, gallery;
         FloatingActionButton undo, redo;
 
@@ -247,6 +268,11 @@ public class CanvasFragment extends Fragment {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startForResultFromGallery.launch(intent);
         });
-//        method_list.setOnItemClickListener((parent, view, position, id) -> method_Selected = position);
     }
+
+    private void uploadFile(File file) {
+        Retrofiter.upload_classify(file, classificationCallback, methodSelected.toLowerCase());
+    }
+
+
 }

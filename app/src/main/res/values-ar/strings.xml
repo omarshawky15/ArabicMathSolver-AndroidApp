@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Arabic Math Solver</string>
+    <string name="undo_str">الرجوع</string>
+    <string name="save_str">حفظ</string>
+    <string name="color_str">لون</string>
+    <string name="gallery_str">معرض الصور</string>
+    <string name="move_str">تحريك</string>
+    <string name="redo">إعادة</string>
+    <string name="eraser_str">الممحاة</string>
+    <string name="pen_str">القلم</string>
+    <string name="simplify_str">تبسيط</string>
+    <string name="polynomial_str">إيجاد الحدود</string>
+    <string name="differentiate_str">تفاضل</string>
+    <string name="integrate_str">تكامل</string>
+    <string name="bottom_desc_str">اختر العملية المطبقة على المعادلة</string>
+    <string name="bottom_title_str">العمليات</string>
+    <string name="pred_textview_str">المعادلة :\nالخريطة :\nالحل :\nالخطأ :</string>
+
+</resources>
