@@ -22,7 +22,9 @@
     <style name="Theme.ArabicMathSolver.lowerMethodsFab" parent="Widget.Design.FloatingActionButton">
         <item name="android:backgroundTint">@color/crimson</item>
     </style>
-
+    <style name="Theme.ArabicMathSolver.upperAnalyzeFab" parent="Widget.Design.FloatingActionButton">
+        <item name="android:backgroundTint">@android:color/holo_blue_dark</item>
+    </style>
     <style name="Widget.App.NavigationView" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="itemIconTint">@color/bottomsheet_item_selector</item>
         <item name="itemTextColor">@color/bottomsheet_item_selector</item>

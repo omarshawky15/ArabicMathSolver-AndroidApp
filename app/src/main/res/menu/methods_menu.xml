@@ -7,23 +7,23 @@
         <item
             android:id="@+id/simplify_method"
             android:enabled="true"
-            android:icon="@drawable/ic_move"
+            android:icon="@drawable/ic_sen"
             android:title="@string/simplify_str" />
         <item
             android:id="@+id/polynomial_method"
             android:contentDescription="@string/polynomial_str"
             android:enabled="true"
-            android:icon="@drawable/ic_move"
+            android:icon="@drawable/ic_sen"
             android:title="@string/polynomial_str" />
         <item
             android:id="@+id/differentiate_method"
             android:enabled="true"
-            android:icon="@drawable/ic_move"
+            android:icon="@drawable/ic_sen"
             android:title="@string/differentiate_str" />
         <item
             android:id="@+id/integrate_method"
             android:enabled="true"
-            android:icon="@drawable/ic_move"
+            android:icon="@drawable/ic_sen"
             android:title="@string/integrate_str" />
     </group>
 </menu>

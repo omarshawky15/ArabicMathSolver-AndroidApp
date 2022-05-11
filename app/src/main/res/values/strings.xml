@@ -6,6 +6,10 @@
     <string name="gallery_str">Gallery</string>
     <string name="move_str">Move</string>
     <string name="pred_textview_str">Equation :\nMapping :\nSolution :\nError :</string>
+    <string name="equation_str">Equation</string>
+    <string name="mapping_str">Mapping</string>
+    <string name="solution_str">Solution</string>
+    <string name="error_str">Error</string>
     <string name="redo">redo</string>
     <string name="eraser_str">Eraser</string>
     <string name="pen_str">Pen</string>

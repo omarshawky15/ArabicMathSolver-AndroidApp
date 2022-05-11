@@ -13,7 +13,6 @@
         android:text="@string/pred_textview_str"
         android:textAlignment="textStart"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,32 +28,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pred_textview">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+        <ImageButton
+            android:id="@+id/btn_gallery"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:contentDescription="@string/gallery_str"
+            android:src="@mipmap/ic_gallery"
+            android:text="@string/gallery_str"
+            android:visibility="gone" />
+        <!--      <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
 
-            <ImageButton
-                android:id="@+id/btn_save"
-                android:layout_width="96dp"
-                android:layout_height="96dp"
-                android:layout_weight="1"
-                android:contentDescription="@string/save_str"
-                android:src="@drawable/ic_floppy_disk"
-                android:text="@string/save_str" />
+              <ImageButton
+                    android:id="@+id/btn_save"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/save_str"
+                    android:src="@drawable/ic_floppy_disk"
+                    android:text="@string/save_str" />
 
-            <ImageButton
-                android:id="@+id/btn_gallery"
-                android:layout_width="96dp"
-                android:layout_height="96dp"
-                android:layout_weight="1"
-                android:contentDescription="@string/gallery_str"
-                android:src="@mipmap/ic_gallery"
-                android:text="@string/gallery_str" />
+
 
         </LinearLayout>
-
+ -->
         <com.arabic.math.solver.drawview.DrawView
             android:id="@+id/draw_view"
             android:layout_width="match_parent"
@@ -78,11 +78,39 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/bottom_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:elevation="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pred_textview">
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:indeterminate="true"
+            app:indeterminateAnimationType="disjoint" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/analyze_fab"
+            style="@style/Theme.ArabicMathSolver.upperAnalyzeFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="@string/undo_str"
+            android:elevation="1dp"
+            android:scaleType="fitCenter"
+            app:layout_anchor="@id/progress_bar"
+            app:layout_anchorGravity="bottom|end"
+            app:maxImageSize="40dp"
+            app:srcCompat="@drawable/ic_forward"
+            app:tint="@color/fab_selector" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/methods_fab"

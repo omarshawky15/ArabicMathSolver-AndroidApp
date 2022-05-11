@@ -27,7 +27,7 @@ public class DrawView extends View {
     private final Map<Integer, ActionHandler> actionHandlers ;
 
     private final int DEFAULT_COLOR = Color.BLACK, GRID_COLOR = Color.GRAY;
-    private final int DEFAULT_STROKE = 10, GRID_STROKE = 1;
+    private final int DEFAULT_STROKE = 14, GRID_STROKE = 1;
     private final int DEFAULT_ALPHA = 0xff, GRID_ALPHA =0x80;
     private final int SAVE_PADDING = 30 ;
     private Bitmap mBitmap;
@@ -89,9 +89,10 @@ public class DrawView extends View {
         manager.scalePaths(scaleMatrix, new Matrix());
         Bitmap tempBitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Bitmap.Config.ARGB_8888);
         Canvas tempCanvas = new Canvas(tempBitmap);
+        tempCanvas.drawColor(Color.WHITE);
         drawPaths(tempCanvas);
         invalidate();
-        return mBitmap;
+        return tempBitmap;
     }
 
     private Matrix computeScaleMatrix() {

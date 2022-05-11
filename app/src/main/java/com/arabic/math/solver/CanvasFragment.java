@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,10 +49,7 @@ import retrofit2.Response;
 public class CanvasFragment extends Fragment {
     private View rootView;
     private DrawViewManager drawViewManager;
-    private static final String[] METHODS = new String[]{
-            "", "polynomial", "differentiate", "integrate"
-    };
-    private int methodSelectedIdx;
+    private Locker locker;
     private String methodSelected;
     PermissionHandler<Map<String, Boolean>> multiPermissionsCallback = new PermissionHandler<>();
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
@@ -87,18 +85,22 @@ public class CanvasFragment extends Fragment {
     public void onViewCreated(@NonNull View mRootView, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(rootView, savedInstanceState);
         this.rootView = mRootView;
+        locker = new Locker();
 
         TextView pred_textview = rootView.findViewById(R.id.pred_textview);
+        rootView.findViewById(R.id.progress_bar).setVisibility(View.INVISIBLE);
         setOnClickMethods();
         classificationCallback = new Callback<Classification>() {
             @Override
             public void onResponse(@NonNull Call<Classification> call,
                                    @NonNull Response<Classification> response) {
-                String pred_result = "Equation : " + response.body().getEquation()
-                        + "\nMapping : " + response.body().getMapping()
-                        + "\nSolution : " + response.body().getSolution()
-                        + "\nError : " + response.body().getError();
+                Resources res = getResources(null);
+                String pred_result = res.getString(R.string.equation_str) + " : " + response.body().getEquation()
+                        + "\n" + res.getString(R.string.mapping_str) + " : " + response.body().getMapping()
+                        + "\n" + res.getString(R.string.solution_str) + " : " + response.body().getSolution()
+                        + "\n" + res.getString(R.string.error_str) + " : " + response.body().getError();
                 pred_textview.setText(pred_result);
+                rootView.findViewById(R.id.progress_bar).setVisibility(locker.unlock() ? View.INVISIBLE : View.VISIBLE);
             }
 
             @Override
@@ -106,6 +108,7 @@ public class CanvasFragment extends Fragment {
                 Log.e("Upload error:", t.getMessage());
                 String pred_result = getResources().getString(R.string.pred_textview_str) + t.getMessage();
                 pred_textview.setText(pred_result);
+                rootView.findViewById(R.id.progress_bar).setVisibility(locker.unlock() ? View.INVISIBLE : View.VISIBLE);
             }
         };
 
@@ -158,15 +161,21 @@ public class CanvasFragment extends Fragment {
 
     }
 
+    private Resources getResources(String local) {
+        Configuration conf = requireContext().getResources().getConfiguration();
+        if (local != null) {
+            conf = new Configuration(conf);
+            conf.setLocale(new Locale(local));
+        }
+        Context localizedContext = requireContext().createConfigurationContext(conf);
+        return localizedContext.getResources();
+    }
+
     //TODO find a cleaner way to do it !!
     private String getMethodNameFromItem(MenuItem item) {
-        int id = item.getItemId();
-        Configuration conf = requireContext().getResources().getConfiguration();
-        conf = new Configuration(conf);
-        conf.setLocale(new Locale("en"));
-        Context localizedContext = requireContext().createConfigurationContext(conf);
-        Resources res = localizedContext.getResources();
+        Resources res = getResources("en");
         String methodName = "";
+        int id = item.getItemId();
         if (id == R.id.simplify_method) {
             methodName = res.getString(R.string.simplify_str);
         } else if (id == R.id.polynomial_method) {
@@ -220,16 +229,17 @@ public class CanvasFragment extends Fragment {
     }
 
     private void setOnClickMethods() {
-        ImageButton save, gallery;
-        FloatingActionButton undo, redo;
-
+        ProgressBar progressBar;
+        ImageButton gallery;
+        FloatingActionButton undo, redo, analyze;
+        progressBar = rootView.findViewById(R.id.progress_bar);
         undo = rootView.findViewById(R.id.undo_fab);
         redo = rootView.findViewById(R.id.redo_fab);
-        save = rootView.findViewById(R.id.btn_save);
+        analyze = rootView.findViewById(R.id.analyze_fab);
         gallery = rootView.findViewById(R.id.btn_gallery);
         redo.setOnClickListener(view -> drawViewManager.redo());
         undo.setOnClickListener(view -> drawViewManager.undo());
-        save.setOnClickListener(view -> {
+        analyze.setOnClickListener(view -> {
             String[] permission_needed;
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
                 permission_needed = new String[]{
@@ -271,6 +281,7 @@ public class CanvasFragment extends Fragment {
     }
 
     private void uploadFile(File file) {
+        rootView.findViewById(R.id.progress_bar).setVisibility(locker.lock() ? View.INVISIBLE : View.VISIBLE);
         Retrofiter.upload_classify(file, classificationCallback, methodSelected.toLowerCase());
     }
 
