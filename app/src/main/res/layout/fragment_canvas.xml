@@ -8,11 +8,13 @@
     <TextView
         android:id="@+id/pred_textview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="150dp"
         android:fontFamily="@font/myfont_regular_1"
         android:text="@string/pred_textview_str"
         android:textAlignment="textStart"
-        android:textSize="20sp"
+        app:autoSizeMaxTextSize="40sp"
+        app:autoSizeStepGranularity="2sp"
+        app:autoSizeTextType="uniform"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

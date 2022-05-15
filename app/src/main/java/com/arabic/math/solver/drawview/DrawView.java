@@ -27,7 +27,7 @@ public class DrawView extends View {
     private final Map<Integer, ActionHandler> actionHandlers ;
 
     private final int DEFAULT_COLOR = Color.BLACK, GRID_COLOR = Color.GRAY;
-    private final int DEFAULT_STROKE = 14, GRID_STROKE = 1;
+    private final int DEFAULT_STROKE = 10, GRID_STROKE = 1;
     private final int DEFAULT_ALPHA = 0xff, GRID_ALPHA =0x80;
     private final int SAVE_PADDING = 30 ;
     private Bitmap mBitmap;

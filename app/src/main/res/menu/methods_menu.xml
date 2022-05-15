@@ -13,17 +13,17 @@
             android:id="@+id/polynomial_method"
             android:contentDescription="@string/polynomial_str"
             android:enabled="true"
-            android:icon="@drawable/ic_sen"
+            android:icon="@drawable/ic_move"
             android:title="@string/polynomial_str" />
         <item
             android:id="@+id/differentiate_method"
             android:enabled="true"
-            android:icon="@drawable/ic_sen"
+            android:icon="@drawable/ic_eraser"
             android:title="@string/differentiate_str" />
         <item
             android:id="@+id/integrate_method"
             android:enabled="true"
-            android:icon="@drawable/ic_sen"
+            android:icon="@drawable/ic_pen"
             android:title="@string/integrate_str" />
     </group>
 </menu>

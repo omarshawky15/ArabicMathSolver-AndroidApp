@@ -1,5 +1,7 @@
 package com.arabic.math.solver.retrofit;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -11,13 +13,10 @@ public class Classification {
     @SerializedName("expression")
     @Expose
     private String expression;
-    @SerializedName("mapping")
-    @Expose
-    private String mapping;
     @SerializedName("solution")
     @Expose
     private String solution;
-
+    @NonNull
     public String getEquation() {
         return expression == null ?"":expression;
     }
@@ -25,15 +24,7 @@ public class Classification {
     public void setExpression(String expression) {
         this.expression = expression;
     }
-
-    public String getMapping() {
-        return mapping == null ?"":mapping;
-    }
-
-    public void setMapping(String mapping) {
-        this.mapping = mapping;
-    }
-
+    @NonNull
     public String getSolution() {
         return solution== null ?"":solution;
     }
@@ -41,7 +32,7 @@ public class Classification {
     public void setSolution(String solution) {
         this.solution = solution;
     }
-
+    @NonNull
     public String getError() {
         return error== null ?"None":error;
     }

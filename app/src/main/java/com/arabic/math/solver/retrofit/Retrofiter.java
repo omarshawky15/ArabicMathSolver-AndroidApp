@@ -14,11 +14,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Retrofiter {
     private final static String BASE_URL = "https://letters-model.herokuapp.com/"; // for server
-//    private final static String BASE_URL = "http://10.0.2.2:5000/"; // for local host from VM
+    //    private final static String BASE_URL = "http://10.0.2.2:5000/"; // for local host from VM
     private static Retrofit retrofit = null;
-    private Retrofiter(){};
+
+    private Retrofiter() {
+    }
+
     public static Retrofit getInstance() {
-        if (retrofit==null) {
+        if (retrofit == null) {
             HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             OkHttpClient client = new OkHttpClient.Builder()
@@ -26,6 +29,7 @@ public class Retrofiter {
                     .readTimeout(60, TimeUnit.SECONDS)
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .build();
+
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
@@ -34,13 +38,14 @@ public class Retrofiter {
         }
         return retrofit;
     }
+
     public static void upload_classify(File file, Callback<Classification> callback, String method) {
         ClassifyAPI service = Retrofiter.getInstance().create(ClassifyAPI.class);
         RequestBody requestFile =
                 RequestBody.create(file, MediaType.parse("image/png"));
         MultipartBody.Part body =
                 MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-        service.classify(body,method).enqueue(callback);
+        service.classify(body, method).enqueue(callback);
     }
 
 }

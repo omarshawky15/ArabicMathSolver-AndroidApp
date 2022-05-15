@@ -20,7 +20,7 @@ public class Imguru {
     public static File storeImage(Context context, Bitmap bmp) {
         String fileName = "IMG_" + DateFormat.format("yyyyMMdd_HH_mm_ss", Calendar.getInstance().getTime());
         String folderName = "ArabicMathSolver";
-        File imageFile ;
+        File imageFile;
         Uri imageUri;
         OutputStream fos;
 
@@ -33,7 +33,7 @@ public class Imguru {
                 contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM" + File.separator + folderName);
                 imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
                 fos = resolver.openOutputStream(imageUri);
-                imageFile = new File(getPathFromUri(context,imageUri));
+                imageFile = new File(getPathFromUri(context, imageUri));
             } else {
                 String imagesDir = Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_DCIM).toString() + File.separator + folderName;
@@ -42,7 +42,6 @@ public class Imguru {
                     imageFile.mkdir();
                 }
                 imageFile = new File(imagesDir, fileName + ".png");
-
                 fos = new FileOutputStream(imageFile);
             }
             bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
@@ -53,7 +52,8 @@ public class Imguru {
         }
         return imageFile;
     }
-    public static String getPathFromUri(Context context,Uri file_uri){
+
+    public static String getPathFromUri(Context context, Uri file_uri) {
         String result;
         String[] projection = new String[]{
                 MediaStore.Images.Media.DATA

@@ -15,9 +15,8 @@
     <string name="integrate_str">تكامل</string>
     <string name="bottom_desc_str">اختر العملية المطبقة على المعادلة</string>
     <string name="bottom_title_str">العمليات</string>
-    <string name="pred_textview_str">المعادلة :\nالخريطة :\nالحل :\nالخطأ :</string>
+    <string name="pred_textview_str">المعادلة :\nالحل :\nالخطأ :</string>
     <string name="equation_str">المعادلة</string>
-    <string name="mapping_str">الخريطة</string>
     <string name="solution_str">الحل</string>
     <string name="error_str">الخطأ</string>
 

@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -95,8 +96,7 @@ public class CanvasFragment extends Fragment {
             public void onResponse(@NonNull Call<Classification> call,
                                    @NonNull Response<Classification> response) {
                 Resources res = getResources(null);
-                String pred_result = res.getString(R.string.equation_str) + " : " + response.body().getEquation()
-                        + "\n" + res.getString(R.string.mapping_str) + " : " + response.body().getMapping()
+                String pred_result = res.getString(R.string.equation_str) + " : " + Html.fromHtml(response.body().getEquation())
                         + "\n" + res.getString(R.string.solution_str) + " : " + response.body().getSolution()
                         + "\n" + res.getString(R.string.error_str) + " : " + response.body().getError();
                 pred_textview.setText(pred_result);
@@ -132,7 +132,6 @@ public class CanvasFragment extends Fragment {
 
         bottomNavDrawer.setNavigationItemSelectedListener(item -> {
             methodSelected = Locale.getDefault().getLanguage().equals("en") ? item.getTitle().toString() : getMethodNameFromItem(item);
-            Log.e("title", methodSelected);
             item.setChecked(true);
             methodsFab.setImageDrawable(item.getIcon());
             navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -241,11 +240,11 @@ public class CanvasFragment extends Fragment {
         undo.setOnClickListener(view -> drawViewManager.undo());
         analyze.setOnClickListener(view -> {
             String[] permission_needed;
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
                 permission_needed = new String[]{
                         Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.INTERNET
+                        Manifest.permission.INTERNET,
                 };
             } else {
                 permission_needed = new String[]{
