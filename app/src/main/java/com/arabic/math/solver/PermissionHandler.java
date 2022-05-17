@@ -12,7 +12,7 @@ public class PermissionHandler<O> implements ActivityResultCallback<O> {
     private ActivityResultCallback<O> callback = null;
     private String[] permissionsNeeded;
     public PermissionHandler() {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
             permissionsNeeded = new String[]{
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
