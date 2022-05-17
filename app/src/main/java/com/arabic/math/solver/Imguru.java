@@ -11,8 +11,11 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.format.DateFormat;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Calendar;
 
@@ -30,7 +33,7 @@ public class Imguru {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
                 contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
-                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM" + File.separator + folderName);
+                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM + File.separator + folderName);
                 imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
                 fos = resolver.openOutputStream(imageUri);
                 imageFile = new File(getPathFromUri(context, imageUri));
@@ -51,6 +54,7 @@ public class Imguru {
             return null;
         }
         return imageFile;
+
     }
 
     public static String getPathFromUri(Context context, Uri file_uri) {
@@ -68,5 +72,18 @@ public class Imguru {
             cursor.close();
         }
         return result;
+    }
+    public static byte[] getByteArrayFromFile (Context context , File file){
+        int size = (int) file.length();
+        byte[] bytes = new byte[size];
+        try {
+            BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
+            buf.read(bytes, 0, bytes.length);
+            buf.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null ;
+        }
+        return bytes ;
     }
 }

@@ -1,6 +1,5 @@
 package com.arabic.math.solver.retrofit;
 
-import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -39,12 +38,12 @@ public class Retrofiter {
         return retrofit;
     }
 
-    public static void upload_classify(File file, Callback<Classification> callback, String method) {
+    public static void upload_classify(byte[] bytes,String filename, Callback<Classification> callback, String method) {
         ClassifyAPI service = Retrofiter.getInstance().create(ClassifyAPI.class);
         RequestBody requestFile =
-                RequestBody.create(file, MediaType.parse("image/png"));
+                RequestBody.create(bytes, MediaType.parse("image/png"));
         MultipartBody.Part body =
-                MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+                MultipartBody.Part.createFormData("file", filename, requestFile);
         service.classify(body, method).enqueue(callback);
     }
 

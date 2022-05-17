@@ -1,13 +1,11 @@
 package com.arabic.math.solver;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Html;
@@ -18,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -96,8 +93,13 @@ public class CanvasFragment extends Fragment {
             public void onResponse(@NonNull Call<Classification> call,
                                    @NonNull Response<Classification> response) {
                 Resources res = getResources(null);
+                StringBuilder solution_str = new StringBuilder();
+                for(int i=0 ;i<response.body().getSolution().size();i++) {
+                    solution_str.append(Html.fromHtml(response.body().getSolution().get(i)));
+                    if(i+1 !=response.body().getSolution().size())solution_str.append(',');
+                }
                 String pred_result = res.getString(R.string.equation_str) + " : " + Html.fromHtml(response.body().getEquation())
-                        + "\n" + res.getString(R.string.solution_str) + " : " + response.body().getSolution()
+                        + "\n" + res.getString(R.string.solution_str) + " : " + solution_str
                         + "\n" + res.getString(R.string.error_str) + " : " + response.body().getError();
                 pred_textview.setText(pred_result);
                 rootView.findViewById(R.id.progress_bar).setVisibility(locker.unlock() ? View.INVISIBLE : View.VISIBLE);
@@ -228,10 +230,8 @@ public class CanvasFragment extends Fragment {
     }
 
     private void setOnClickMethods() {
-        ProgressBar progressBar;
         ImageButton gallery;
         FloatingActionButton undo, redo, analyze;
-        progressBar = rootView.findViewById(R.id.progress_bar);
         undo = rootView.findViewById(R.id.undo_fab);
         redo = rootView.findViewById(R.id.redo_fab);
         analyze = rootView.findViewById(R.id.analyze_fab);
@@ -239,21 +239,7 @@ public class CanvasFragment extends Fragment {
         redo.setOnClickListener(view -> drawViewManager.redo());
         undo.setOnClickListener(view -> drawViewManager.undo());
         analyze.setOnClickListener(view -> {
-            String[] permission_needed;
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
-                permission_needed = new String[]{
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.INTERNET,
-                };
-            } else {
-                permission_needed = new String[]{
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.INTERNET
-                };
-            }
-
-            if (!PermissionHandler.checkPermissions(permission_needed, requireContext())) {
+            if (!multiPermissionsCallback.checkPermissions(requireContext())) {
                 multiPermissionsCallback.setCallback(result -> {
                     if (!result.containsValue(Boolean.FALSE)) {
                         File imageFile = Imguru.storeImage(requireContext(), drawViewManager.save());
@@ -267,12 +253,14 @@ public class CanvasFragment extends Fragment {
                         Toast.makeText(requireContext(), err_message.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
-                requestPermissionLauncher.launch(permission_needed);
+                requestPermissionLauncher.launch(multiPermissionsCallback.getPermissionsNeeded());
             } else {
                 File imageFile = Imguru.storeImage(requireContext(), drawViewManager.save());
                 uploadFile(imageFile);
             }
         });
+        //TODO delete this after debugging
+        rootView.findViewById(R.id.save_fab).setOnClickListener(v -> Imguru.storeImage(requireContext(), drawViewManager.save()));
         gallery.setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startForResultFromGallery.launch(intent);
@@ -281,7 +269,8 @@ public class CanvasFragment extends Fragment {
 
     private void uploadFile(File file) {
         rootView.findViewById(R.id.progress_bar).setVisibility(locker.lock() ? View.INVISIBLE : View.VISIBLE);
-        Retrofiter.upload_classify(file, classificationCallback, methodSelected.toLowerCase());
+        byte[] bytes = Imguru.getByteArrayFromFile(requireContext(),file);
+        Retrofiter.upload_classify(bytes,file.getName(), classificationCallback, methodSelected.toLowerCase());
     }
 
 

@@ -38,25 +38,6 @@
             android:src="@mipmap/ic_gallery"
             android:text="@string/gallery_str"
             android:visibility="gone" />
-        <!--      <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-
-              <ImageButton
-                    android:id="@+id/btn_save"
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:layout_weight="1"
-                    android:contentDescription="@string/save_str"
-                    android:src="@drawable/ic_floppy_disk"
-                    android:text="@string/save_str" />
-
-
-
-        </LinearLayout>
- -->
         <com.arabic.math.solver.drawview.DrawView
             android:id="@+id/draw_view"
             android:layout_width="match_parent"
@@ -112,6 +93,24 @@
             app:layout_anchorGravity="bottom|end"
             app:maxImageSize="40dp"
             app:srcCompat="@drawable/ic_forward"
+            app:tint="@color/fab_selector" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/save_fab"
+            style="@style/Theme.ArabicMathSolver.upperAnalyzeFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="@string/undo_str"
+            android:elevation="1dp"
+            android:scaleType="fitCenter"
+            app:layout_anchor="@id/progress_bar"
+            app:layout_anchorGravity="bottom|start"
+            app:maxImageSize="40dp"
+            app:srcCompat="@drawable/ic_save"
             app:tint="@color/fab_selector" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

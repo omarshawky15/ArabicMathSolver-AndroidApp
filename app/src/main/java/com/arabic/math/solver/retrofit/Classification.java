@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 public class Classification {
 
     @SerializedName("error")
@@ -15,7 +17,7 @@ public class Classification {
     private String expression;
     @SerializedName("solution")
     @Expose
-    private String solution;
+    private ArrayList<String> solution;
     @NonNull
     public String getEquation() {
         return expression == null ?"":expression;
@@ -25,11 +27,11 @@ public class Classification {
         this.expression = expression;
     }
     @NonNull
-    public String getSolution() {
-        return solution== null ?"":solution;
+    public ArrayList<String>   getSolution() {
+        return solution== null ?new ArrayList<> ():solution;
     }
 
-    public void setSolution(String solution) {
+    public void setSolution(ArrayList<String> solution) {
         this.solution = solution;
     }
     @NonNull
