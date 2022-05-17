@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:text="@string/pred_textview_str"
-        android:textAlignment="textStart"
+        android:textAlignment="textEnd"
         app:autoSizeMaxTextSize="30sp"
         app:autoSizeStepGranularity="2sp"
         app:autoSizeTextType="uniform"
@@ -76,7 +76,7 @@
             app:indeterminateAnimationType="disjoint" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/analyze_fab"
+            android:id="@+id/solve_fab"
             style="@style/Theme.ArabicMathSolver.upperAnalyzeFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -110,8 +110,7 @@
             app:layout_anchorGravity="bottom|start"
             app:maxImageSize="40dp"
             app:srcCompat="@drawable/ic_save"
-            app:tint="@color/fab_selector"
-            android:visibility="gone"/>
+            app:tint="@color/fab_selector" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/methods_fab"

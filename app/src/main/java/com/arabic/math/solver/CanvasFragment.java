@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Html;
+import android.text.SpannableStringBuilder;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -37,6 +39,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.Map;
 
@@ -94,21 +97,20 @@ public class CanvasFragment extends Fragment {
             public void onResponse(@NonNull Call<Classification> call,
                                    @NonNull Response<Classification> response) {
                 Resources res = getResources(null);
-                StringBuilder solution_str = new StringBuilder();
-                for(int i=0 ;i<response.body().getSolution().size();i++) {
-                    solution_str.append(Html.fromHtml(response.body().getSolution().get(i),Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH));
-                    if(i+1 !=response.body().getSolution().size())solution_str.append(',');
+                SpannableStringBuilder solution_str = new SpannableStringBuilder();
+                for (int i = 0; i < response.body().getSolution().size(); i++) {
+                    solution_str.append(Html.fromHtml(response.body().getSolution().get(i), Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH));
+                    if (i + 1 != response.body().getSolution().size()) solution_str.append(',');
                 }
-                String pred_result = res.getString(R.string.equation_str) + " : " + Html.fromHtml(response.body().getEquation(),Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH)
-                        + "\n" + res.getString(R.string.solution_str) + " : " + solution_str
-                        + "\n" + res.getString(R.string.error_str) + " : " + response.body().getError();
-                pred_textview.setText(pred_result);
+                SpannableStringBuilder builder = new SpannableStringBuilder();
+                builder.append(res.getString(R.string.equation_str)).append(" : ").append(Html.fromHtml(response.body().getEquation(), Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH)
+                ).append("\n").append(res.getString(R.string.solution_str)).append(" : ").append(solution_str).append("\n").append(res.getString(R.string.error_str)).append(" : ").append(response.body().getError());
+                pred_textview.setText(builder);
                 rootView.findViewById(R.id.progress_bar).setVisibility(locker.unlock() ? View.INVISIBLE : View.VISIBLE);
             }
 
             @Override
             public void onFailure(@NonNull Call<Classification> call, @NonNull Throwable t) {
-                Log.e("Upload error:", t.getMessage());
                 String pred_result = getResources().getString(R.string.pred_textview_str) + t.getMessage();
                 pred_textview.setText(pred_result);
                 rootView.findViewById(R.id.progress_bar).setVisibility(locker.unlock() ? View.INVISIBLE : View.VISIBLE);
@@ -232,14 +234,14 @@ public class CanvasFragment extends Fragment {
 
     private void setOnClickMethods() {
         ImageButton gallery;
-        FloatingActionButton undo, redo, analyze;
+        FloatingActionButton undo, redo, solve;
         undo = rootView.findViewById(R.id.undo_fab);
         redo = rootView.findViewById(R.id.redo_fab);
-        analyze = rootView.findViewById(R.id.analyze_fab);
+        solve = rootView.findViewById(R.id.solve_fab);
         gallery = rootView.findViewById(R.id.btn_gallery);
         redo.setOnClickListener(view -> drawViewManager.redo());
         undo.setOnClickListener(view -> drawViewManager.undo());
-        analyze.setOnClickListener(view -> {
+        solve.setOnClickListener(view -> {
             if (!multiPermissionsCallback.checkPermissions(requireContext())) {
                 multiPermissionsCallback.setCallback(result -> {
                     if (!result.containsValue(Boolean.FALSE)) {
@@ -261,7 +263,7 @@ public class CanvasFragment extends Fragment {
             }
         });
         //TODO delete this after debugging
-        rootView.findViewById(R.id.save_fab).setOnClickListener(v -> Imguru.storeImage(requireContext(), drawViewManager.save()));
+        rootView.findViewById(R.id.save_fab).setOnClickListener(view -> Imguru.storeImage(requireContext(), drawViewManager.save()));
         gallery.setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startForResultFromGallery.launch(intent);
@@ -270,10 +272,11 @@ public class CanvasFragment extends Fragment {
 
     private void uploadImage() {
         rootView.findViewById(R.id.progress_bar).setVisibility(locker.lock() ? View.INVISIBLE : View.VISIBLE);
+        String fileName = "IMG_" + DateFormat.format("yyyyMMdd_HH_mm_ss", Calendar.getInstance().getTime()) + ".png";
         Bitmap currImg = drawViewManager.save();
-        File file = Imguru.storeImage(requireContext(),currImg);
+//        File file = Imguru.storeImage(requireContext(), currImg);
         byte[] bytes = Imguru.getByteArrayFromImage(currImg);
-        Retrofiter.upload_classify(bytes,file.getName(), classificationCallback, methodSelected.toLowerCase());
+        Retrofiter.upload_classify(bytes, fileName, classificationCallback, methodSelected.toLowerCase());
     }
 
 
