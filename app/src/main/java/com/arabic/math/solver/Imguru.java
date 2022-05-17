@@ -12,10 +12,12 @@ import android.provider.MediaStore;
 import android.text.format.DateFormat;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Calendar;
 
@@ -73,17 +75,31 @@ public class Imguru {
         }
         return result;
     }
-    public static byte[] getByteArrayFromFile (Context context , File file){
-        int size = (int) file.length();
-        byte[] bytes = new byte[size];
+
+    // TODO Can't verify that it's working and don't have time to do it
+    public static byte[] getByteArrayFromFile(Context context, File file) {
         try {
+            int size;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                InputStream ios = context.getContentResolver().openInputStream(Uri.fromFile(file));
+                size = ios.available();
+            } else {
+                size = (int) file.length();
+            }
+            byte[] bytes = new byte[size];
             BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
             buf.read(bytes, 0, bytes.length);
             buf.close();
+            return bytes;
         } catch (IOException e) {
             e.printStackTrace();
-            return null ;
+            return null;
         }
-        return bytes ;
+    }
+
+    public static byte[] getByteArrayFromImage(Bitmap image) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
     }
 }

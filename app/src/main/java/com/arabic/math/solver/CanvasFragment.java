@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -60,7 +61,7 @@ public class CanvasFragment extends Fragment {
                 if (result.getData() != null) {
                     Uri selectedImageUri = result.getData().getData();
                     File img_file = new File(Imguru.getPathFromUri(requireContext(), selectedImageUri));
-                    uploadFile(img_file);
+//                    uploadFile(img_file);
                 }
             } catch (Exception exception) {
                 Log.d("External storage error:", exception.getLocalizedMessage());
@@ -242,8 +243,8 @@ public class CanvasFragment extends Fragment {
             if (!multiPermissionsCallback.checkPermissions(requireContext())) {
                 multiPermissionsCallback.setCallback(result -> {
                     if (!result.containsValue(Boolean.FALSE)) {
-                        File imageFile = Imguru.storeImage(requireContext(), drawViewManager.save());
-                        uploadFile(imageFile);
+//                        File imageFile = Imguru.storeImage(requireContext(), drawViewManager.save());
+                        uploadImage();
                     } else {
                         StringBuilder err_message = new StringBuilder("Permissions required were denied {");
                         for (Map.Entry<String, Boolean> i : result.entrySet())
@@ -255,8 +256,8 @@ public class CanvasFragment extends Fragment {
                 });
                 requestPermissionLauncher.launch(multiPermissionsCallback.getPermissionsNeeded());
             } else {
-                File imageFile = Imguru.storeImage(requireContext(), drawViewManager.save());
-                uploadFile(imageFile);
+//                File imageFile = Imguru.storeImage(requireContext(), drawViewManager.save());
+                uploadImage();
             }
         });
         //TODO delete this after debugging
@@ -267,9 +268,11 @@ public class CanvasFragment extends Fragment {
         });
     }
 
-    private void uploadFile(File file) {
+    private void uploadImage() {
         rootView.findViewById(R.id.progress_bar).setVisibility(locker.lock() ? View.INVISIBLE : View.VISIBLE);
-        byte[] bytes = Imguru.getByteArrayFromFile(requireContext(),file);
+        Bitmap currImg = drawViewManager.save();
+        File file = Imguru.storeImage(requireContext(),currImg);
+        byte[] bytes = Imguru.getByteArrayFromImage(currImg);
         Retrofiter.upload_classify(bytes,file.getName(), classificationCallback, methodSelected.toLowerCase());
     }
 

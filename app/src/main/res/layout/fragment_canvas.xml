@@ -111,7 +111,8 @@
             app:layout_anchorGravity="bottom|start"
             app:maxImageSize="40dp"
             app:srcCompat="@drawable/ic_save"
-            app:tint="@color/fab_selector" />
+            app:tint="@color/fab_selector"
+            android:visibility="gone"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/methods_fab"
