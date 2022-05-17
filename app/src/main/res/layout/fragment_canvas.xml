@@ -4,15 +4,14 @@
     android:name=".CanvasFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+<!--        android:fontFamily="@font/myfont_regular_1"-->
     <TextView
         android:id="@+id/pred_textview"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:fontFamily="@font/myfont_regular_1"
         android:text="@string/pred_textview_str"
         android:textAlignment="textStart"
-        app:autoSizeMaxTextSize="40sp"
+        app:autoSizeMaxTextSize="30sp"
         app:autoSizeStepGranularity="2sp"
         app:autoSizeTextType="uniform"
         app:layout_constraintEnd_toEndOf="parent"

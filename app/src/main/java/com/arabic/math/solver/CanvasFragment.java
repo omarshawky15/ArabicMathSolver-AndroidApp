@@ -96,10 +96,10 @@ public class CanvasFragment extends Fragment {
                 Resources res = getResources(null);
                 StringBuilder solution_str = new StringBuilder();
                 for(int i=0 ;i<response.body().getSolution().size();i++) {
-                    solution_str.append(Html.fromHtml(response.body().getSolution().get(i)));
+                    solution_str.append(Html.fromHtml(response.body().getSolution().get(i),Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH));
                     if(i+1 !=response.body().getSolution().size())solution_str.append(',');
                 }
-                String pred_result = res.getString(R.string.equation_str) + " : " + Html.fromHtml(response.body().getEquation())
+                String pred_result = res.getString(R.string.equation_str) + " : " + Html.fromHtml(response.body().getEquation(),Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH)
                         + "\n" + res.getString(R.string.solution_str) + " : " + solution_str
                         + "\n" + res.getString(R.string.error_str) + " : " + response.body().getError();
                 pred_textview.setText(pred_result);
