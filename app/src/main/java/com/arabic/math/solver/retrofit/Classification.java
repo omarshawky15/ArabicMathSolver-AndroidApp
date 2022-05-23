@@ -18,28 +18,35 @@ public class Classification {
     @SerializedName("solution")
     @Expose
     private ArrayList<String> solution;
+
     @NonNull
     public String getEquation() {
-        return expression == null ?"":expression;
+        return expression == null ? "" : expression;
     }
 
     public void setExpression(String expression) {
         this.expression = expression;
     }
+
     @NonNull
-    public ArrayList<String>   getSolution() {
-        return solution== null ?new ArrayList<> ():solution;
+    public ArrayList<String> getSolution() {
+        return solution == null ? new ArrayList<>() : solution;
     }
 
     public void setSolution(ArrayList<String> solution) {
         this.solution = solution;
     }
+
     @NonNull
     public String getError() {
-        return error== null ?"None":error;
+        return error == null ? "None" : error;
     }
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public boolean containsNull() {
+        return solution == null || expression == null || error == null;
     }
 }

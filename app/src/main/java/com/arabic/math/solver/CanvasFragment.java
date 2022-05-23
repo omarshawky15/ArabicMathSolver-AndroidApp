@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +28,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.arabic.math.solver.drawview.DrawView;
@@ -40,7 +43,6 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -96,27 +98,39 @@ public class CanvasFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<Classification> call,
                                    @NonNull Response<Classification> response) {
-                Resources res = getResources(null);
-                SpannableStringBuilder solution_str = new SpannableStringBuilder();
-                for (int i = 0; i < response.body().getSolution().size(); i++) {
-                    solution_str.append(Html.fromHtml(response.body().getSolution().get(i), Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH));
-                    if (i + 1 != response.body().getSolution().size()) solution_str.append(',');
+                Resources res = getResourcesRef();
+                Typeface myTypeface = Typeface.create(ResourcesCompat.getFont(requireContext(), R.font.math_arabic),
+                        Typeface.NORMAL);
+                int HtmlFlag = Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH;
+                SpannableStringBuilder solution_str = new SpannableStringBuilder(), builder = new SpannableStringBuilder();
+                Classification classRes = response.body();
+                if (classRes != null && !classRes.containsNull()) {
+                    for (int i = 0; i < classRes.getSolution().size(); i++) {
+                        solution_str.append(Html.fromHtml(classRes.getSolution().get(i), HtmlFlag));
+                        if (i + 1 != classRes.getSolution().size())
+                            solution_str.append(" , ");
+                    }
+                    builder.append(res.getString(R.string.equation_str)).append(" : ").append(Html.fromHtml(classRes.getEquation(), HtmlFlag), new CustomTypefaceSpan(myTypeface), 0);
+                    if (!classRes.getSolution().isEmpty())
+                        builder.append("\n").append(res.getString(R.string.solution_str)).append(" : ").append(solution_str, new CustomTypefaceSpan(myTypeface), 0);
+                    if (!classRes.getError().isEmpty())
+                        builder.append("\n").append(res.getString(R.string.error_str)).append(" : ").append(classRes.getError());
+                } else {
+                    builder.append("\n").append(res.getString(R.string.error_str)).append(" : ").append(response.message());
                 }
-                SpannableStringBuilder builder = new SpannableStringBuilder();
-                builder.append(res.getString(R.string.equation_str)).append(" : ").append(Html.fromHtml(response.body().getEquation(), Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH)
-                ).append("\n").append(res.getString(R.string.solution_str)).append(" : ").append(solution_str).append("\n").append(res.getString(R.string.error_str)).append(" : ").append(response.body().getError());
                 pred_textview.setText(builder);
+                HorizontalScrollView scroll = rootView.findViewById(R.id.pred_textview_scroll);
+                scroll.post(() -> scroll.fullScroll(HorizontalScrollView.FOCUS_RIGHT));
                 rootView.findViewById(R.id.progress_bar).setVisibility(locker.unlock() ? View.INVISIBLE : View.VISIBLE);
             }
 
             @Override
             public void onFailure(@NonNull Call<Classification> call, @NonNull Throwable t) {
-                String pred_result = getResources().getString(R.string.pred_textview_str) + t.getMessage();
+                String pred_result = getResourcesRef().getString(R.string.error_str)+ " : " + t.getMessage();
                 pred_textview.setText(pred_result);
                 rootView.findViewById(R.id.progress_bar).setVisibility(locker.unlock() ? View.INVISIBLE : View.VISIBLE);
             }
         };
-
         initDrawView();
         initBottomTools();
         initBottomNavDrawer();
@@ -136,7 +150,8 @@ public class CanvasFragment extends Fragment {
         bottomNavDrawer.setCheckedItem(defaultItem);
 
         bottomNavDrawer.setNavigationItemSelectedListener(item -> {
-            methodSelected = Locale.getDefault().getLanguage().equals("en") ? item.getTitle().toString() : getMethodNameFromItem(item);
+//            methodSelected = getMethodNameFromItem(item);
+            methodSelected = item.getTitleCondensed().toString();
             item.setChecked(true);
             methodsFab.setImageDrawable(item.getIcon());
             navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -165,32 +180,34 @@ public class CanvasFragment extends Fragment {
 
     }
 
-    private Resources getResources(String local) {
+    private Resources getResourcesRef() {
         Configuration conf = requireContext().getResources().getConfiguration();
-        if (local != null) {
-            conf = new Configuration(conf);
-            conf.setLocale(new Locale(local));
-        }
+//        if (local != null) {
+//            conf = new Configuration(conf);
+//            conf.setLocale(new Locale(local));
+//        }
         Context localizedContext = requireContext().createConfigurationContext(conf);
         return localizedContext.getResources();
     }
 
-    //TODO find a cleaner way to do it !!
-    private String getMethodNameFromItem(MenuItem item) {
-        Resources res = getResources("en");
-        String methodName = "";
-        int id = item.getItemId();
-        if (id == R.id.simplify_method) {
-            methodName = res.getString(R.string.simplify_str);
-        } else if (id == R.id.polynomial_method) {
-            methodName = res.getString(R.string.polynomial_str);
-        } else if (id == R.id.differentiate_method) {
-            methodName = res.getString(R.string.differentiate_str);
-        } else if (id == R.id.integrate_method) {
-            methodName = res.getString(R.string.integrate_str);
-        }
-        return methodName;
-    }
+//
+//    //TODO find a cleaner way to do it !!
+//    private String getMethodNameFromItem(MenuItem item) {
+//        Resources res = getResources();
+//        String methodName = "";
+//        int id = item.getItemId();
+//        methodName = item.getTitleCondensed().toString();
+//        if (id == R.id.simplify_method) {
+//            methodName = item.getTitleCondensed().toString();
+//        } else if (id == R.id.polynomial_method) {
+//            methodName = res.getString(R.string.polynomial_method_name);
+//        } else if (id == R.id.differentiate_method) {
+//            methodName = res.getString(R.string.differentiate_method_name);
+//        } else if (id == R.id.integrate_method) {
+//            methodName = res.getString(R.string.integrate_method_name);
+//        }
+//        return methodName;
+//    }
 
     private void initBottomTools() {
         BottomNavigationView bottom_tools_nav = rootView.findViewById(R.id.bottom_tools_nav);
@@ -263,7 +280,12 @@ public class CanvasFragment extends Fragment {
             }
         });
         //TODO delete this after debugging
-        rootView.findViewById(R.id.save_fab).setOnClickListener(view -> Imguru.storeImage(requireContext(), drawViewManager.save()));
+        rootView.findViewById(R.id.save_fab).setOnClickListener(view -> {
+            Bitmap imageToStore = drawViewManager.save();
+            Imguru.storeImage(requireContext(), imageToStore);
+            imageToStore.recycle();
+
+        });
         gallery.setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startForResultFromGallery.launch(intent);
@@ -277,6 +299,7 @@ public class CanvasFragment extends Fragment {
 //        File file = Imguru.storeImage(requireContext(), currImg);
         byte[] bytes = Imguru.getByteArrayFromImage(currImg);
         Retrofiter.upload_classify(bytes, fileName, classificationCallback, methodSelected.toLowerCase());
+        currImg.recycle();
     }
 
 

@@ -9,6 +9,7 @@ import com.arabic.math.solver.drawview.DrawViewManager;
 import java.util.List;
 
 public class EraseActionHandler extends ActionHandler{
+    public final int EXTRA_PAD = 25 ;
     public EraseActionHandler(DrawViewManager manager) {
         super(manager);
     }
@@ -27,7 +28,7 @@ public class EraseActionHandler extends ActionHandler{
         float dx = Math.abs(newX - start.x);
         float dy = Math.abs(newY - start.y);
         if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-            float left = Math.min(newX, start.x), right = Math.max(newX, start.x), top = Math.min(newY, start.y), bottom = Math.max(newY, start.y);
+            float left = Math.min(newX, start.x) - EXTRA_PAD, right = Math.max(newX, start.x)+ EXTRA_PAD, top = Math.min(newY, start.y)-EXTRA_PAD, bottom = Math.max(newY, start.y)+EXTRA_PAD;
             RectF thumbRect = new RectF(left, top, right, bottom), pathRect = new RectF();
             List<Path> paths = manager.getDrawnPaths();
             for (int i = 0; i < paths.size(); i++) {

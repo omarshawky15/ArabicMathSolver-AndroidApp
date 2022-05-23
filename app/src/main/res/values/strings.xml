@@ -13,6 +13,10 @@
     <string name="polynomial_str">إيجاد الحدود</string>
     <string name="differentiate_str">تفاضل</string>
     <string name="integrate_str">تكامل</string>
+    <string name="simplify_method_name">Simplify</string>
+    <string name="polynomial_method_name">Polynomial</string>
+    <string name="differentiate_method_name">Differentiate</string>
+    <string name="integrate_method_name">Integrate</string>
     <string name="bottom_desc_str">اختر العملية المطبقة على المعادلة</string>
     <string name="bottom_title_str">العمليات</string>
     <string name="pred_textview_str">المعادلة :\nالحل :\nالخطأ :</string>

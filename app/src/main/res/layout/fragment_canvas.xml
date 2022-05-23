@@ -4,20 +4,31 @@
     android:name=".CanvasFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-<!--        android:fontFamily="@font/myfont_regular_1"-->
-    <TextView
-        android:id="@+id/pred_textview"
+    <HorizontalScrollView
+        android:id="@+id/pred_textview_scroll"
         android:layout_width="match_parent"
         android:layout_height="150dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:scrollbars="none"
+        >
+<!-- android:fontFamily="@font/math_arabic"-->
+    <TextView
+        android:id="@+id/pred_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:text="@string/pred_textview_str"
-        android:textAlignment="textEnd"
-        app:autoSizeMaxTextSize="30sp"
+        android:textSize="30sp"
         app:autoSizeStepGranularity="2sp"
         app:autoSizeTextType="uniform"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:autoSizeMaxTextSize="30sp"
+        android:textAlignment="textEnd"
+        android:layout_gravity="end"
+        />
+    </HorizontalScrollView>
+<!--app:autoSizeStepGranularity="2sp"
+        app:autoSizeTextType="uniform"
+                app:autoSizeMaxTextSize="30sp"-->
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
@@ -27,7 +38,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pred_textview">
+        app:layout_constraintTop_toBottomOf="@id/pred_textview_scroll">
 
         <ImageButton
             android:id="@+id/btn_gallery"
@@ -65,7 +76,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pred_textview">
+        app:layout_constraintTop_toBottomOf="@id/pred_textview_scroll">
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/progress_bar"
@@ -188,14 +199,12 @@
             android:orientation="vertical"
             app:behavior_hideable="true"
             app:layout_behavior="@string/bottom_sheet_behavior">
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
-                android:fontFamily="@font/myfont_regular_1"
                 android:text="@string/bottom_title_str"
                 android:textAlignment="textStart"
                 android:textColor="@color/black"
@@ -207,7 +216,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
-                android:fontFamily="@font/myfont_regular_1"
+                android:textColor="@color/black"
                 android:text="@string/bottom_desc_str"
                 android:textAlignment="textStart"
                 android:textSize="15sp" />
