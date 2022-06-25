@@ -4,31 +4,29 @@
     android:name=".CanvasFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <HorizontalScrollView
         android:id="@+id/pred_textview_scroll"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="125dp"
         android:scrollbars="none"
-        >
-<!-- android:fontFamily="@font/math_arabic"-->
-    <TextView
-        android:id="@+id/pred_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:text="@string/pred_textview_str"
-        android:textSize="30sp"
-        app:autoSizeStepGranularity="2sp"
-        app:autoSizeTextType="uniform"
-        app:autoSizeMaxTextSize="30sp"
-        android:textAlignment="textEnd"
-        android:layout_gravity="end"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <!-- android:fontFamily="@font/math_arabic"-->
+        <TextView
+            android:id="@+id/pred_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:text="@string/pred_textview_str"
+            android:textAlignment="textEnd"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="25sp"
+            app:autoSizeMaxTextSize="25sp"
+            app:autoSizeStepGranularity="2sp"
+            app:autoSizeTextType="uniform" />
     </HorizontalScrollView>
-<!--app:autoSizeStepGranularity="2sp"
-        app:autoSizeTextType="uniform"
-                app:autoSizeMaxTextSize="30sp"-->
+
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
@@ -48,6 +46,7 @@
             android:src="@mipmap/ic_gallery"
             android:text="@string/gallery_str"
             android:visibility="gone" />
+
         <com.arabic.math.solver.drawview.DrawView
             android:id="@+id/draw_view"
             android:layout_width="match_parent"
@@ -72,6 +71,7 @@
         android:id="@+id/bottom_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:animateLayoutChanges="true"
         android:elevation="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -88,14 +88,10 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/solve_fab"
-            style="@style/Theme.ArabicMathSolver.upperAnalyzeFab"
+            style="@style/Theme.ArabicMathSolver.mainFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
             android:contentDescription="@string/undo_str"
             android:elevation="1dp"
             android:scaleType="fitCenter"
@@ -104,16 +100,13 @@
             app:maxImageSize="40dp"
             app:srcCompat="@drawable/ic_forward"
             app:tint="@color/fab_selector" />
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/save_fab"
-            style="@style/Theme.ArabicMathSolver.upperAnalyzeFab"
+            style="@style/Theme.ArabicMathSolver.secondaryFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
             android:contentDescription="@string/undo_str"
             android:elevation="1dp"
             android:scaleType="fitCenter"
@@ -125,14 +118,10 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/methods_fab"
-            style="@style/Theme.ArabicMathSolver.lowerMethodsFab"
+            style="@style/Theme.ArabicMathSolver.mainFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
             android:contentDescription="@string/undo_str"
             android:elevation="1dp"
             app:layout_anchor="@id/bottom_tools_nav"
@@ -146,10 +135,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
             android:contentDescription="@string/undo_str"
             app:layout_anchor="@id/bottom_tools_nav"
             app:layout_anchorGravity="top|start"
@@ -162,15 +147,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
+            android:contentDescription="@string/redo"
+            app:layout_anchor="@id/undo_fab"
+            app:layout_anchorGravity="end"
+            app:srcCompat="@drawable/ic_redo" />
+
+        <Button
+            android:id="@+id/clear_all_btn"
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
-            android:contentDescription="@string/redo"
-            app:layout_anchor="@id/undo_fab"
-            app:layout_anchorGravity="end"
-            app:srcCompat="@drawable/ic_redo"
-            app:tint="@color/fab_selector" />
+            android:backgroundTint="@android:color/holo_blue_dark"
+            android:text="@string/delete_all_str"
+            android:translationY="-5dp"
+            android:visibility="visible"
+            app:icon="@drawable/ic_delete_forever"
+            app:layout_anchor="@id/bottom_tools_nav"
+            app:layout_anchorGravity="center_horizontal" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_tools_nav"
@@ -199,6 +197,7 @@
             android:orientation="vertical"
             app:behavior_hideable="true"
             app:layout_behavior="@string/bottom_sheet_behavior">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -216,9 +215,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
-                android:textColor="@color/black"
                 android:text="@string/bottom_desc_str"
                 android:textAlignment="textStart"
+                android:textColor="@color/black"
                 android:textSize="15sp" />
 
             <com.google.android.material.navigation.NavigationView

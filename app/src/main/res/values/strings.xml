@@ -23,5 +23,10 @@
     <string name="equation_str">المعادلة</string>
     <string name="solution_str">الحل</string>
     <string name="error_str">الخطأ</string>
+    <string name="delete_all_str">مسح الكل</string>
+    <string name="dialog_clear_all_msg_str">هذا سيقوم بمسح كل شئ ولا يمكن التراجع عن العملية، إكمال ؟</string>
+    <string name="dialog_clear_all_title_str">هل انت متأكد ؟</string>
+    <string name="confirm_str">تأكيد</string>
+    <string name="cancel_str">إلغاء</string>
 
 </resources>

@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -29,8 +30,10 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
+import com.arabic.math.solver.drawview.ClearDialogFragment;
 import com.arabic.math.solver.drawview.DrawView;
 import com.arabic.math.solver.drawview.DrawViewManager;
 import com.arabic.math.solver.drawview.DrawViewModes;
@@ -50,7 +53,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class CanvasFragment extends Fragment {
+public class CanvasFragment extends Fragment implements ClearDialogFragment.ClearDialogListener{
     private View rootView;
     private DrawViewManager drawViewManager;
     private Locker locker;
@@ -102,19 +105,10 @@ public class CanvasFragment extends Fragment {
                 Typeface myTypeface = Typeface.create(ResourcesCompat.getFont(requireContext(), R.font.math_arabic),
                         Typeface.NORMAL);
                 int HtmlFlag = Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH;
-                SpannableStringBuilder solution_str = new SpannableStringBuilder(), builder = new SpannableStringBuilder();
+                SpannableStringBuilder builder = new SpannableStringBuilder();
                 Classification classRes = response.body();
                 if (classRes != null && !classRes.containsNull()) {
-                    for (int i = 0; i < classRes.getSolution().size(); i++) {
-                        solution_str.append(Html.fromHtml(classRes.getSolution().get(i), HtmlFlag));
-                        if (i + 1 != classRes.getSolution().size())
-                            solution_str.append(" , ");
-                    }
-                    builder.append(res.getString(R.string.equation_str)).append(" : ").append(Html.fromHtml(classRes.getEquation(), HtmlFlag), new CustomTypefaceSpan(myTypeface), 0);
-                    if (!classRes.getSolution().isEmpty())
-                        builder.append("\n").append(res.getString(R.string.solution_str)).append(" : ").append(solution_str, new CustomTypefaceSpan(myTypeface), 0);
-                    if (!classRes.getError().isEmpty())
-                        builder.append("\n").append(res.getString(R.string.error_str)).append(" : ").append(classRes.getError());
+                    builder = classRes.buildResponeStr(res,myTypeface,HtmlFlag);
                 } else {
                     builder.append("\n").append(res.getString(R.string.error_str)).append(" : ").append(response.message());
                 }
@@ -131,6 +125,7 @@ public class CanvasFragment extends Fragment {
                 rootView.findViewById(R.id.progress_bar).setVisibility(locker.unlock() ? View.INVISIBLE : View.VISIBLE);
             }
         };
+
         initDrawView();
         initBottomTools();
         initBottomNavDrawer();
@@ -150,7 +145,6 @@ public class CanvasFragment extends Fragment {
         bottomNavDrawer.setCheckedItem(defaultItem);
 
         bottomNavDrawer.setNavigationItemSelectedListener(item -> {
-//            methodSelected = getMethodNameFromItem(item);
             methodSelected = item.getTitleCondensed().toString();
             item.setChecked(true);
             methodsFab.setImageDrawable(item.getIcon());
@@ -180,34 +174,6 @@ public class CanvasFragment extends Fragment {
 
     }
 
-    private Resources getResourcesRef() {
-        Configuration conf = requireContext().getResources().getConfiguration();
-//        if (local != null) {
-//            conf = new Configuration(conf);
-//            conf.setLocale(new Locale(local));
-//        }
-        Context localizedContext = requireContext().createConfigurationContext(conf);
-        return localizedContext.getResources();
-    }
-
-//
-//    //TODO find a cleaner way to do it !!
-//    private String getMethodNameFromItem(MenuItem item) {
-//        Resources res = getResources();
-//        String methodName = "";
-//        int id = item.getItemId();
-//        methodName = item.getTitleCondensed().toString();
-//        if (id == R.id.simplify_method) {
-//            methodName = item.getTitleCondensed().toString();
-//        } else if (id == R.id.polynomial_method) {
-//            methodName = res.getString(R.string.polynomial_method_name);
-//        } else if (id == R.id.differentiate_method) {
-//            methodName = res.getString(R.string.differentiate_method_name);
-//        } else if (id == R.id.integrate_method) {
-//            methodName = res.getString(R.string.integrate_method_name);
-//        }
-//        return methodName;
-//    }
 
     private void initBottomTools() {
         BottomNavigationView bottom_tools_nav = rootView.findViewById(R.id.bottom_tools_nav);
@@ -231,9 +197,10 @@ public class CanvasFragment extends Fragment {
     private void initDrawView() {
         DrawView paint = rootView.findViewById(R.id.draw_view);
         FloatingActionButton undo, redo;
+        Button clearBtn = rootView.findViewById(R.id.clear_all_btn);
         undo = rootView.findViewById(R.id.undo_fab);
         redo = rootView.findViewById(R.id.redo_fab);
-        this.drawViewManager = new DrawViewManager(paint).with(undo, redo);
+        this.drawViewManager = new DrawViewManager(paint).withClear(clearBtn).withRedoUndo(undo, redo);
         paint.setManager(drawViewManager);
 
         ViewTreeObserver vto = paint.getViewTreeObserver();
@@ -251,18 +218,24 @@ public class CanvasFragment extends Fragment {
 
     private void setOnClickMethods() {
         ImageButton gallery;
-        FloatingActionButton undo, redo, solve;
+        FloatingActionButton undo, redo, solve,save;
+        Button clearBtn = rootView.findViewById(R.id.clear_all_btn);
         undo = rootView.findViewById(R.id.undo_fab);
         redo = rootView.findViewById(R.id.redo_fab);
         solve = rootView.findViewById(R.id.solve_fab);
         gallery = rootView.findViewById(R.id.btn_gallery);
+        save = rootView.findViewById(R.id.save_fab);
+
+        clearBtn.setOnClickListener(v -> {
+            DialogFragment dialog = new ClearDialogFragment(this);
+            dialog.show(getParentFragmentManager(), "ClearDialogTag");
+        });
         redo.setOnClickListener(view -> drawViewManager.redo());
         undo.setOnClickListener(view -> drawViewManager.undo());
         solve.setOnClickListener(view -> {
             if (!multiPermissionsCallback.checkPermissions(requireContext())) {
                 multiPermissionsCallback.setCallback(result -> {
                     if (!result.containsValue(Boolean.FALSE)) {
-//                        File imageFile = Imguru.storeImage(requireContext(), drawViewManager.save());
                         uploadImage();
                     } else {
                         StringBuilder err_message = new StringBuilder("Permissions required were denied {");
@@ -275,12 +248,11 @@ public class CanvasFragment extends Fragment {
                 });
                 requestPermissionLauncher.launch(multiPermissionsCallback.getPermissionsNeeded());
             } else {
-//                File imageFile = Imguru.storeImage(requireContext(), drawViewManager.save());
                 uploadImage();
             }
         });
         //TODO delete this after debugging
-        rootView.findViewById(R.id.save_fab).setOnClickListener(view -> {
+        save.setOnClickListener(view -> {
             Bitmap imageToStore = drawViewManager.save();
             Imguru.storeImage(requireContext(), imageToStore);
             imageToStore.recycle();
@@ -296,11 +268,24 @@ public class CanvasFragment extends Fragment {
         rootView.findViewById(R.id.progress_bar).setVisibility(locker.lock() ? View.INVISIBLE : View.VISIBLE);
         String fileName = "IMG_" + DateFormat.format("yyyyMMdd_HH_mm_ss", Calendar.getInstance().getTime()) + ".png";
         Bitmap currImg = drawViewManager.save();
-//        File file = Imguru.storeImage(requireContext(), currImg);
         byte[] bytes = Imguru.getByteArrayFromImage(currImg);
         Retrofiter.upload_classify(bytes, fileName, classificationCallback, methodSelected.toLowerCase());
         currImg.recycle();
     }
 
+    private Resources getResourcesRef() {
+        Configuration conf = requireContext().getResources().getConfiguration();
+        Context localizedContext = requireContext().createConfigurationContext(conf);
+        return localizedContext.getResources();
+    }
 
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        drawViewManager.deleteAll();
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        dialog.dismiss();
+    }
 }

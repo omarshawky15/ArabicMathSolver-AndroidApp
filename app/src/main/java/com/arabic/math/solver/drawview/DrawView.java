@@ -2,6 +2,7 @@ package com.arabic.math.solver.drawview;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,9 +12,13 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.annotation.ColorInt;
+
+import com.arabic.math.solver.R;
 import com.arabic.math.solver.drawview.actionhandlers.ActionHandler;
 import com.arabic.math.solver.drawview.actionhandlers.DrawActionHandler;
 import com.arabic.math.solver.drawview.actionhandlers.EraseActionHandler;
@@ -26,16 +31,20 @@ public class DrawView extends View {
 
     private DrawViewManager manager;
     private final Map<Integer, ActionHandler> actionHandlers;
-
-    private final int DEFAULT_COLOR = Color.BLACK, GRID_COLOR = Color.GRAY;
+    @ColorInt
+    private int CANVAS_PATH_COLOR , GRID_COLOR = Color.GRAY, BACKGROUND_CANVAS_COLOR;
+    @ColorInt
+    private final int SERVER_PATH_COLOR = Color.BLACK, BACKGROUND_SERVER_COLOR= Color.WHITE;
     private final int DEFAULT_STROKE = 10, GRID_STROKE = 1, ERASER_STROKE = 5;
     private final int DEFAULT_ALPHA = 0xff, GRID_ALPHA = 0xA0;
     private final int SAVE_PADDING = 30;
+    private final boolean CLEAR_CANVAS = true;
     private Bitmap mBitmap;
     public Canvas mCanvas;
     private Paint mBitmapPaint;
-    private final Paint pathPaint, gridPaint, eraserPaint;
-    public boolean eraseFlag ;
+    private final Paint myCanvasPathPaint, myServerPathPaint, myGridPaint, myEraserPaint;
+    public boolean eraseFlag;
+
     public DrawView(Context context) {
         this(context, null);
     }
@@ -43,40 +52,54 @@ public class DrawView extends View {
     public DrawView(Context context, AttributeSet attrs) {
         super(context, attrs);
         actionHandlers = new HashMap<>();
-        eraseFlag = true;
+        eraseFlag = CLEAR_CANVAS;
+
+        setCanvasColors(context);
+
         // the below methods smoothens
         // the drawings of the user
-        pathPaint = new Paint();
-        pathPaint.setAntiAlias(true);
-        pathPaint.setDither(true);
-        pathPaint.setColor(DEFAULT_COLOR);
-        pathPaint.setStyle(Paint.Style.STROKE);
-        pathPaint.setStrokeJoin(Paint.Join.ROUND);
-        pathPaint.setStrokeCap(Paint.Cap.ROUND);
-        pathPaint.setAlpha(DEFAULT_ALPHA);
-        pathPaint.setStrokeWidth(DEFAULT_STROKE);
+        myCanvasPathPaint = new Paint();
+        myCanvasPathPaint.setAntiAlias(true);
+        myCanvasPathPaint.setDither(true);
+        myCanvasPathPaint.setColor(CANVAS_PATH_COLOR);
+        myCanvasPathPaint.setStyle(Paint.Style.STROKE);
+        myCanvasPathPaint.setStrokeJoin(Paint.Join.ROUND);
+        myCanvasPathPaint.setStrokeCap(Paint.Cap.ROUND);
+        myCanvasPathPaint.setAlpha(DEFAULT_ALPHA);
+        myCanvasPathPaint.setStrokeWidth(DEFAULT_STROKE);
 
-        gridPaint = new Paint();
-        gridPaint.setAntiAlias(true);
-        gridPaint.setDither(true);
-        gridPaint.setColor(GRID_COLOR);
-        gridPaint.setAlpha(GRID_ALPHA);
-        gridPaint.setStyle(Paint.Style.STROKE);
-        gridPaint.setStrokeWidth(GRID_STROKE);
-        gridPaint.setStrokeJoin(Paint.Join.ROUND);
-        gridPaint.setStrokeCap(Paint.Cap.ROUND);
-        gridPaint.setPathEffect(new DashPathEffect(new float[]{10f, 20f}, 0f));
+        myServerPathPaint = new Paint();
+        myServerPathPaint.setAntiAlias(true);
+        myServerPathPaint.setDither(true);
+        myServerPathPaint.setColor(SERVER_PATH_COLOR);
+        myServerPathPaint.setStyle(Paint.Style.STROKE);
+        myServerPathPaint.setStrokeJoin(Paint.Join.ROUND);
+        myServerPathPaint.setStrokeCap(Paint.Cap.ROUND);
+        myServerPathPaint.setAlpha(DEFAULT_ALPHA);
+        myServerPathPaint.setStrokeWidth(DEFAULT_STROKE);
 
-        eraserPaint = new Paint();
-        eraserPaint.setAntiAlias(true);
-        eraserPaint.setDither(true);
-        eraserPaint.setColor(DEFAULT_COLOR);
-        eraserPaint.setAlpha(DEFAULT_ALPHA);
-        eraserPaint.setStyle(Paint.Style.STROKE);
-        eraserPaint.setStrokeWidth(ERASER_STROKE);
-        eraserPaint.setStrokeJoin(Paint.Join.ROUND);
-        eraserPaint.setStrokeCap(Paint.Cap.ROUND);
-        eraserPaint.setPathEffect(new DashPathEffect(new float[]{15f, 15f}, 0f));
+
+        myGridPaint = new Paint();
+        myGridPaint.setAntiAlias(true);
+        myGridPaint.setDither(true);
+        myGridPaint.setColor(GRID_COLOR);
+        myGridPaint.setAlpha(GRID_ALPHA);
+        myGridPaint.setStyle(Paint.Style.STROKE);
+        myGridPaint.setStrokeWidth(GRID_STROKE);
+        myGridPaint.setStrokeJoin(Paint.Join.ROUND);
+        myGridPaint.setStrokeCap(Paint.Cap.ROUND);
+        myGridPaint.setPathEffect(new DashPathEffect(new float[]{10f, 20f}, 0f));
+
+        myEraserPaint = new Paint();
+        myEraserPaint.setAntiAlias(true);
+        myEraserPaint.setDither(true);
+        myEraserPaint.setColor(CANVAS_PATH_COLOR);
+        myEraserPaint.setAlpha(DEFAULT_ALPHA);
+        myEraserPaint.setStyle(Paint.Style.STROKE);
+        myEraserPaint.setStrokeWidth(ERASER_STROKE);
+        myEraserPaint.setStrokeJoin(Paint.Join.ROUND);
+        myEraserPaint.setStrokeCap(Paint.Cap.ROUND);
+        myEraserPaint.setPathEffect(new DashPathEffect(new float[]{15f, 15f}, 0f));
 
 //        manager = new DrawViewManager(this); //TODO to be considered later
     }
@@ -91,7 +114,16 @@ public class DrawView extends View {
         actionHandlers.put(DrawViewModes.MOVE, new MoveActionHandler(this.manager));
         actionHandlers.put(DrawViewModes.ERASE, new EraseActionHandler(this.manager));
     }
+    private void setCanvasColors(Context context){
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = context.getTheme();
 
+        theme.resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
+        CANVAS_PATH_COLOR = typedValue.data;
+
+        theme.resolveAttribute(android.R.attr.windowBackground, typedValue, true);
+        BACKGROUND_CANVAS_COLOR = typedValue.data;
+    }
     public void init(int height, int width) {
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
@@ -103,8 +135,8 @@ public class DrawView extends View {
         manager.scalePaths(scaleMatrix, new Matrix());
         Bitmap tempBitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Bitmap.Config.ARGB_8888);
         Canvas tempCanvas = new Canvas(tempBitmap);
-        tempCanvas.drawColor(Color.WHITE);
-        drawPaths(tempCanvas);
+        tempCanvas.drawColor(BACKGROUND_SERVER_COLOR);
+        drawPaths(tempCanvas,myServerPathPaint);
         invalidate();
         return tempBitmap;
     }
@@ -123,7 +155,7 @@ public class DrawView extends View {
         return scaleMatrix;
     }
 
-    private void drawPaths(Canvas canvas) {
+    private void drawPaths(Canvas canvas, Paint pathPaint) {
         for (Path i : manager.getDrawnPaths()) {
             canvas.drawPath(i, pathPaint);
         }
@@ -131,12 +163,12 @@ public class DrawView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if(eraseFlag){
-            mCanvas.drawColor(Color.WHITE);
-        }else eraseFlag = true ;
+        if (eraseFlag == CLEAR_CANVAS) {
+            mCanvas.drawColor(BACKGROUND_CANVAS_COLOR);
+        } else eraseFlag = CLEAR_CANVAS;
         canvas.save();
         drawGridLines(mCanvas);
-        drawPaths(mCanvas);
+        drawPaths(mCanvas, myCanvasPathPaint);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.restore();
     }
@@ -146,13 +178,13 @@ public class DrawView extends View {
         float gridSize = 30f;
         float pad = Math.max(getMeasuredHeight(), getMeasuredWidth()) / gridSize;
         for (int j = 0; j <= Math.max(canvasWidth, canvasHeight); j += (int) pad) {
-            canvas.drawLine(0, j, canvasWidth, j, gridPaint);
-            canvas.drawLine(j, 0, j, canvasHeight, gridPaint);
+            canvas.drawLine(0, j, canvasWidth, j, myGridPaint);
+            canvas.drawLine(j, 0, j, canvasHeight, myGridPaint);
         }
     }
 
     private void drawCircle(Canvas canvas, float x, float y) {
-        canvas.drawCircle(x, y, ((EraseActionHandler) actionHandlers.get(DrawViewModes.ERASE)).EXTRA_PAD, eraserPaint);
+        canvas.drawCircle(x, y, ((EraseActionHandler) actionHandlers.get(DrawViewModes.ERASE)).EXTRA_PAD, myEraserPaint);
 
     }
 
@@ -160,13 +192,16 @@ public class DrawView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         actionHandlers.get(manager.getMode()).handle(event);
-        mCanvas.drawColor(Color.WHITE);
+        mCanvas.drawColor(BACKGROUND_CANVAS_COLOR);
         if (manager.isErase() && (event.getAction() & MotionEvent.ACTION_MASK) != MotionEvent.ACTION_UP)
             drawCircle(mCanvas, event.getX(), event.getY());
-        eraseFlag = false;
+        eraseFlag = !CLEAR_CANVAS;
         invalidate();
         return true;
     }
 
+    protected void resetEraseFlag() {
+        eraseFlag = CLEAR_CANVAS;
+    }
 
 }
