@@ -7,7 +7,13 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Html;
@@ -53,7 +59,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class CanvasFragment extends Fragment implements ClearDialogFragment.ClearDialogListener{
+public class CanvasFragment extends Fragment implements ClearDialogFragment.ClearDialogListener {
     private View rootView;
     private DrawViewManager drawViewManager;
     private Locker locker;
@@ -108,7 +114,7 @@ public class CanvasFragment extends Fragment implements ClearDialogFragment.Clea
                 SpannableStringBuilder builder = new SpannableStringBuilder();
                 Classification classRes = response.body();
                 if (classRes != null && !classRes.containsNull()) {
-                    builder = classRes.buildResponeStr(res,myTypeface,HtmlFlag);
+                    builder = classRes.buildResponeStr(res, myTypeface, HtmlFlag);
                 } else {
                     builder.append("\n").append(res.getString(R.string.error_str)).append(" : ").append(response.message());
                 }
@@ -120,15 +126,73 @@ public class CanvasFragment extends Fragment implements ClearDialogFragment.Clea
 
             @Override
             public void onFailure(@NonNull Call<Classification> call, @NonNull Throwable t) {
-                String pred_result = getResourcesRef().getString(R.string.error_str)+ " : " + t.getMessage();
+                String pred_result = getResourcesRef().getString(R.string.error_str) + " : " + t.getMessage();
                 pred_textview.setText(pred_result);
                 rootView.findViewById(R.id.progress_bar).setVisibility(locker.unlock() ? View.INVISIBLE : View.VISIBLE);
             }
         };
-
+        initConnectivityObserver();
         initDrawView();
         initBottomTools();
         initBottomNavDrawer();
+    }
+
+    private void initConnectivityObserver() {
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+                .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
+                .build();
+        ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                super.onAvailable(network);
+                requireActivity().runOnUiThread(() -> {
+                    setNoInternetConnectivity(true);
+                });
+            }
+
+            @Override
+            public void onLost(@NonNull Network network) {
+                super.onLost(network);
+                requireActivity().runOnUiThread(() -> {
+                    setNoInternetConnectivity(false);
+                });
+            }
+
+        };
+        ConnectivityManager connectivityManager = requireContext().getApplicationContext().getSystemService(ConnectivityManager.class);
+        connectivityManager.requestNetwork(networkRequest, networkCallback);
+
+        setNoInternetConnectivity(checkCurrentInternetConnection());
+    }
+
+    private boolean checkCurrentInternetConnection() {
+        ConnectivityManager connectivityManager = requireContext().getApplicationContext().getSystemService(ConnectivityManager.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+            return capabilities != null &&
+                    (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET));
+        } else {
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        }
+    }
+
+    private void setNoInternetConnectivity(boolean isConnected) {
+        TextView internet_textview = rootView.findViewById(R.id.internet_textview);
+        FloatingActionButton solve = rootView.findViewById(R.id.solve_fab);
+
+        if (isConnected) {
+            internet_textview.setVisibility(View.INVISIBLE);
+            solve.setVisibility(View.VISIBLE);
+        } else {
+            internet_textview.setVisibility(View.VISIBLE);
+            solve.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void initBottomNavDrawer() {
@@ -170,6 +234,7 @@ public class CanvasFragment extends Fragment implements ClearDialogFragment.Clea
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 
             }
+
         });
 
     }
@@ -200,7 +265,7 @@ public class CanvasFragment extends Fragment implements ClearDialogFragment.Clea
         Button clearBtn = rootView.findViewById(R.id.clear_all_btn);
         undo = rootView.findViewById(R.id.undo_fab);
         redo = rootView.findViewById(R.id.redo_fab);
-        this.drawViewManager = new DrawViewManager(paint).withClear(clearBtn).withRedoUndo(undo, redo);
+        this.drawViewManager = DrawViewManager.getInstance(paint).withClear(clearBtn).withRedoUndo(undo, redo);
         paint.setManager(drawViewManager);
 
         ViewTreeObserver vto = paint.getViewTreeObserver();
@@ -218,7 +283,7 @@ public class CanvasFragment extends Fragment implements ClearDialogFragment.Clea
 
     private void setOnClickMethods() {
         ImageButton gallery;
-        FloatingActionButton undo, redo, solve,save;
+        FloatingActionButton undo, redo, solve, save;
         Button clearBtn = rootView.findViewById(R.id.clear_all_btn);
         undo = rootView.findViewById(R.id.undo_fab);
         redo = rootView.findViewById(R.id.redo_fab);

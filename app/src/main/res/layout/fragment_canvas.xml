@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:name=".CanvasFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
 
     <HorizontalScrollView
         android:id="@+id/pred_textview_scroll"
@@ -27,6 +28,20 @@
             app:autoSizeTextType="uniform" />
     </HorizontalScrollView>
 
+    <TextView
+        android:id="@+id/internet_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/crimson"
+        android:elevation="1dp"
+        android:gravity="center_horizontal"
+        android:text="@string/internet_str"
+        android:textAlignment="center"
+        android:textColor="?attr/colorOnSecondary"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pred_textview_scroll" />
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
@@ -36,7 +51,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pred_textview_scroll">
+        app:layout_constraintTop_toBottomOf="@id/internet_textview">
 
         <ImageButton
             android:id="@+id/btn_gallery"
@@ -76,7 +91,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pred_textview_scroll">
+        app:layout_constraintTop_toBottomOf="@id/internet_textview">
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/progress_bar"
@@ -172,7 +187,7 @@
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_tools_nav"
-            style="@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface"
+            style="@style/Theme.ArabicMathSolver.BottomNavigationView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -186,13 +201,14 @@
         android:elevation="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="visible">
 
         <LinearLayout
             android:id="@+id/bottom_sheet_behavior_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
+            android:background="?attr/colorOnSecondary"
             android:elevation="8dp"
             android:orientation="vertical"
             app:behavior_hideable="true"
@@ -206,7 +222,7 @@
                 android:layout_marginEnd="10dp"
                 android:text="@string/bottom_title_str"
                 android:textAlignment="textStart"
-                android:textColor="@color/black"
+                android:textColor="?attr/colorOnPrimary"
                 android:textSize="25sp"
                 android:textStyle="bold" />
 
@@ -217,7 +233,7 @@
                 android:layout_marginEnd="15dp"
                 android:text="@string/bottom_desc_str"
                 android:textAlignment="textStart"
-                android:textColor="@color/black"
+                android:textColor="?attr/colorOnPrimary"
                 android:textSize="15sp" />
 
             <com.google.android.material.navigation.NavigationView

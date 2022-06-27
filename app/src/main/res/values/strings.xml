@@ -28,5 +28,6 @@
     <string name="dialog_clear_all_title_str">هل انت متأكد ؟</string>
     <string name="confirm_str">تأكيد</string>
     <string name="cancel_str">إلغاء</string>
+    <string name="internet_str">لا يوجد اتصال بالإنترنت، تحتاج اتصال بالإنترنت للإكمال</string>
 
 </resources>

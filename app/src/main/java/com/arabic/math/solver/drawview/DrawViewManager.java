@@ -1,5 +1,6 @@
 package com.arabic.math.solver.drawview;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Path;
@@ -20,11 +21,38 @@ public class DrawViewManager {
     private final List<Path> drawnPaths;
     private final List<Pair<Character, Path>> previousCmd, nextCmd;
     private final HashMap<Path, Integer> pathRefs;
-    private final DrawView paint;
+    private DrawView paint;
     private FloatingActionButton redoFab, undoFab;
-    private Button clearBtn ;
+    private Button clearBtn;
     private int mode;
-    public DrawViewManager(DrawView paint) {
+    @SuppressLint("StaticFieldLeak")
+    private static DrawViewManager instance;
+
+    public static DrawViewManager getInstance(DrawView paint) {
+        if (instance == null) {
+            instance = new DrawViewManager(paint);
+        } else {
+            instance.setPaintView(paint);
+        }
+        instance.cleanButtons();
+        return instance;
+    }
+
+    private void cleanButtons() {
+        redoFab = null;
+        undoFab = null;
+        clearBtn = null;
+    }
+
+    private void setPaintView(DrawView paint) {
+        this.paint = paint;
+    }
+
+    private DrawViewManager() {
+        this(null);
+    }
+
+    private DrawViewManager(DrawView paint) {
         mode = DrawViewModes.DRAW;
         drawnPaths = new ArrayList<>();
         previousCmd = new ArrayList<>();
@@ -103,6 +131,7 @@ public class DrawViewManager {
         resetButtons();
         return this;
     }
+
     public DrawViewManager withClear(Button clearBtn) {
         this.clearBtn = clearBtn;
         return this;
@@ -132,7 +161,8 @@ public class DrawViewManager {
     private void resetButtons() {
         if (undoFab != null) undoFab.setEnabled(previousCmd.size() != 0);
         if (redoFab != null) redoFab.setEnabled(nextCmd.size() != 0);
-        if(clearBtn !=null) clearBtn.setVisibility(mode == DrawViewModes.ERASE && drawnPaths.size() !=0 ? View.VISIBLE:View.GONE);
+        if (clearBtn != null)
+            clearBtn.setVisibility(mode == DrawViewModes.ERASE && drawnPaths.size() != 0 ? View.VISIBLE : View.GONE);
         paint.invalidate();
     }
 
