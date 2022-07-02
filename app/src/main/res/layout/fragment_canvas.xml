@@ -3,17 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:name=".CanvasFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:animateLayoutChanges="true">
+    android:layout_height="match_parent">
 
     <HorizontalScrollView
         android:id="@+id/pred_textview_scroll"
         android:layout_width="match_parent"
         android:layout_height="125dp"
+        android:elevation="2dp"
         android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-        <!-- android:fontFamily="@font/math_arabic"-->
+
         <TextView
             android:id="@+id/pred_textview"
             android:layout_width="wrap_content"
@@ -37,11 +37,12 @@
         android:gravity="center_horizontal"
         android:text="@string/internet_str"
         android:textAlignment="center"
-        android:textColor="?attr/colorOnSecondary"
+        android:textColor="@color/white"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pred_textview_scroll" />
+
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
@@ -74,10 +75,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha="0.3"
-        android:background="@android:color/darker_gray"
+        android:background="@color/darker_gray"
         android:elevation="3dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/bottom_layout"
+        app:layout_constraintBottom_toTopOf="@id/bottom_sheet_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -196,30 +197,32 @@
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/bottom_sheet_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="5dp"
+        android:elevation="4dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:visibility="visible">
+        app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
             android:id="@+id/bottom_sheet_behavior_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorOnSecondary"
-            android:elevation="8dp"
             android:orientation="vertical"
             app:behavior_hideable="true"
+            app:behavior_skipCollapsed="true"
             app:layout_behavior="@string/bottom_sheet_behavior">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
+                android:layout_gravity="end"
                 android:text="@string/bottom_title_str"
                 android:textAlignment="textStart"
                 android:textColor="?attr/colorOnPrimary"
@@ -227,10 +230,11 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
+                android:layout_gravity="end"
                 android:text="@string/bottom_desc_str"
                 android:textAlignment="textStart"
                 android:textColor="?attr/colorOnPrimary"

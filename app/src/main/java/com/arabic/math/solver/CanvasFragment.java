@@ -38,6 +38,11 @@ import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.transition.Fade;
+import androidx.transition.Slide;
+import androidx.transition.Transition;
+import androidx.transition.TransitionManager;
+import androidx.transition.TransitionSet;
 
 import com.arabic.math.solver.drawview.ClearDialogFragment;
 import com.arabic.math.solver.drawview.DrawView;
@@ -64,6 +69,7 @@ public class CanvasFragment extends Fragment implements ClearDialogFragment.Clea
     private DrawViewManager drawViewManager;
     private Locker locker;
     private String methodSelected;
+    private  Transition internet_transition, solve_transition, scrimTransition;
     PermissionHandler<Map<String, Boolean>> multiPermissionsCallback = new PermissionHandler<>();
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), multiPermissionsCallback);
@@ -131,10 +137,23 @@ public class CanvasFragment extends Fragment implements ClearDialogFragment.Clea
                 rootView.findViewById(R.id.progress_bar).setVisibility(locker.unlock() ? View.INVISIBLE : View.VISIBLE);
             }
         };
+        initTransitionUsed();
         initConnectivityObserver();
         initDrawView();
         initBottomTools();
         initBottomNavDrawer();
+    }
+
+    private void initTransitionUsed() {
+        solve_transition = new Fade();
+        internet_transition = new Slide();
+        scrimTransition = new Fade();
+        internet_transition.setDuration(500);
+        internet_transition.addTarget(R.id.internet_textview);
+        solve_transition.setDuration(500);
+        solve_transition.addTarget(R.id.solve_fab);
+        scrimTransition.setDuration(200);
+        scrimTransition.addTarget(R.id.scrim);
     }
 
     private void initConnectivityObserver() {
@@ -183,15 +202,19 @@ public class CanvasFragment extends Fragment implements ClearDialogFragment.Clea
     }
 
     private void setNoInternetConnectivity(boolean isConnected) {
+        Log.e("internet" , String.valueOf(isConnected));
         TextView internet_textview = rootView.findViewById(R.id.internet_textview);
         FloatingActionButton solve = rootView.findViewById(R.id.solve_fab);
-
+        TransitionSet set =  new TransitionSet();
+        set.addTransition(internet_transition);
+        set.addTransition(solve_transition);
+        TransitionManager.beginDelayedTransition((ViewGroup) rootView, set);
         if (isConnected) {
-            internet_textview.setVisibility(View.INVISIBLE);
+            internet_textview.setVisibility(View.GONE);
             solve.setVisibility(View.VISIBLE);
         } else {
             internet_textview.setVisibility(View.VISIBLE);
-            solve.setVisibility(View.INVISIBLE);
+            solve.setVisibility(View.GONE);
         }
     }
 
@@ -200,6 +223,7 @@ public class CanvasFragment extends Fragment implements ClearDialogFragment.Clea
         BottomSheetBehavior<View> navBehavior = BottomSheetBehavior.from(rootView.findViewById(R.id.bottom_sheet_behavior_id));
         FloatingActionButton methodsFab = rootView.findViewById(R.id.methods_fab);
         View scrim = rootView.findViewById(R.id.scrim);
+
         navBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         MenuItem defaultItem = bottomNavDrawer.getMenu().getItem(0);
@@ -227,6 +251,7 @@ public class CanvasFragment extends Fragment implements ClearDialogFragment.Clea
         navBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                TransitionManager.beginDelayedTransition((ViewGroup) rootView, scrimTransition);
                 scrim.setVisibility(newState == BottomSheetBehavior.STATE_HIDDEN ? View.INVISIBLE : View.VISIBLE);
             }
 
