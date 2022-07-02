@@ -32,13 +32,14 @@ public class DrawView extends View {
     private DrawViewManager manager;
     private final Map<Integer, ActionHandler> actionHandlers;
     @ColorInt
-    private int CANVAS_PATH_COLOR , GRID_COLOR = Color.GRAY, BACKGROUND_CANVAS_COLOR;
+    private int CANVAS_PATH_COLOR, GRID_COLOR = Color.GRAY, BACKGROUND_CANVAS_COLOR;
     @ColorInt
-    private final int SERVER_PATH_COLOR = Color.BLACK, BACKGROUND_SERVER_COLOR= Color.WHITE;
+    private final int SERVER_PATH_COLOR = Color.BLACK, BACKGROUND_SERVER_COLOR = Color.WHITE;
     private final int DEFAULT_STROKE = 10, GRID_STROKE = 1, ERASER_STROKE = 5;
     private final int DEFAULT_ALPHA = 0xff, GRID_ALPHA = 0xA0;
     private final int SAVE_PADDING = 30;
-    private final boolean CLEAR_CANVAS = true;
+    private final int SERVER_HEIGHT = 2160, SERVER_WIDTH = 3840;
+    private final boolean CLEAR_CANVAS = true, SERVER_SCALE = true, SCREEN_SCALE = false;
     private Bitmap mBitmap;
     public Canvas mCanvas;
     private Paint mBitmapPaint;
@@ -114,7 +115,8 @@ public class DrawView extends View {
         actionHandlers.put(DrawViewModes.MOVE, new MoveActionHandler(this.manager));
         actionHandlers.put(DrawViewModes.ERASE, new EraseActionHandler(this.manager));
     }
-    private void setCanvasColors(Context context){
+
+    private void setCanvasColors(Context context) {
         TypedValue typedValue = new TypedValue();
         Resources.Theme theme = context.getTheme();
 
@@ -124,6 +126,7 @@ public class DrawView extends View {
         theme.resolveAttribute(android.R.attr.windowBackground, typedValue, true);
         BACKGROUND_CANVAS_COLOR = typedValue.data;
     }
+
     public void init(int height, int width) {
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
@@ -131,18 +134,25 @@ public class DrawView extends View {
     }
 
     protected Bitmap save() {
-        Matrix scaleMatrix = computeScaleMatrix();
+        Matrix scaleMatrix = computeScaleMatrix(SERVER_SCALE);
         manager.scalePaths(scaleMatrix, new Matrix());
-        Bitmap tempBitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap tempBitmap = Bitmap.createBitmap(SERVER_WIDTH, SERVER_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas tempCanvas = new Canvas(tempBitmap);
         tempCanvas.drawColor(BACKGROUND_SERVER_COLOR);
-        drawPaths(tempCanvas,myServerPathPaint);
+        drawPaths(tempCanvas, myServerPathPaint);
+        scaleMatrix = computeScaleMatrix(SCREEN_SCALE);
+        manager.scalePaths(scaleMatrix, new Matrix());
         invalidate();
         return tempBitmap;
     }
 
-    private Matrix computeScaleMatrix() {
-        RectF new_dim = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MIN_VALUE, Float.MIN_VALUE), tempRect = new RectF(), old_dim = new RectF(0, 0, getMeasuredWidth(), getMeasuredHeight());
+    private Matrix computeScaleMatrix(boolean scale) {
+        RectF new_dim = new RectF(Float.MAX_VALUE, Float.MAX_VALUE, Float.MIN_VALUE, Float.MIN_VALUE), tempRect = new RectF();
+        RectF old_dim = null;
+        if (scale == SERVER_SCALE)
+            old_dim = new RectF(0, 0, SERVER_WIDTH, SERVER_HEIGHT);
+        else if (scale == SCREEN_SCALE)
+            old_dim = new RectF(0, 0, getMeasuredWidth(), getMeasuredHeight());
         for (Path i : manager.getDrawnPaths()) {
             i.computeBounds(tempRect, false);
             new_dim.left = Math.min(new_dim.left, tempRect.left - SAVE_PADDING);

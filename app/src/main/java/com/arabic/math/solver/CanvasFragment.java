@@ -227,7 +227,7 @@ public class CanvasFragment extends Fragment implements ClearDialogFragment.Clea
         navBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                scrim.setVisibility(newState == BottomSheetBehavior.STATE_HIDDEN ? View.GONE : View.VISIBLE);
+                scrim.setVisibility(newState == BottomSheetBehavior.STATE_HIDDEN ? View.INVISIBLE : View.VISIBLE);
             }
 
             @Override
