@@ -2,21 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/polynomial_method"
-            android:enabled="true"
-            android:icon="@drawable/ic_move"
-            android:title="@string/polynomial_str"
-            android:titleCondensed="@string/polynomial_method_name" />
-        <item
             android:id="@+id/simplify_method"
             android:enabled="true"
             android:icon="@drawable/ic_sen"
             android:title="@string/simplify_str"
             android:titleCondensed="@string/simplify_method_name" />
         <item
+            android:id="@+id/polynomial_method"
+            android:enabled="true"
+            android:icon="@drawable/ic_sad"
+            android:title="@string/polynomial_str"
+            android:titleCondensed="@string/polynomial_method_name" />
+        <item
             android:id="@+id/differentiate_method"
             android:enabled="true"
-            android:icon="@drawable/ic_eraser"
+            android:icon="@drawable/ic_diff_2"
             android:title="@string/differentiate_str"
             android:titleCondensed="@string/differentiate_method_name" />
         <item

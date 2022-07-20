@@ -371,7 +371,10 @@ public class CanvasFragment extends Fragment implements ClearDialogFragment.Clea
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
+        TextView predTextView = rootView.findViewById(R.id.pred_textview);
+        predTextView.setText(R.string.pred_textview_str);
         drawViewManager.deleteAll();
+
     }
 
     @Override
