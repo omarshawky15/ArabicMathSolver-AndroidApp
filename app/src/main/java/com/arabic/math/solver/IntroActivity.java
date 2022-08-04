@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-
+/* -------------------------------------- Uncompleted Activity (Future Work) -------------------------------------- */
 public class IntroActivity extends AppCompatActivity {
     private Button next;
     private Button previous;
@@ -24,7 +24,8 @@ public class IntroActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        checkFirstTime();
+//        checkFirstTime(); /* Uncomment to develop later */
+        launchDashBoard();
         setContentView(R.layout.activity_intro);
         next = findViewById(R.id.button1);
         previous = findViewById(R.id.button2);
